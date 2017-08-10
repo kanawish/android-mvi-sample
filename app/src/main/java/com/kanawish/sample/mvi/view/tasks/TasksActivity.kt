@@ -1,15 +1,12 @@
 package com.kanawish.sample.mvi.view.tasks
 
 import android.os.Bundle
-import android.support.annotation.VisibleForTesting
 import android.support.design.widget.NavigationView
-import android.support.test.espresso.IdlingResource
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.util.ActivityUtils
-import com.kanawish.sample.mvi.util.EspressoIdlingResource
 import kotlinx.android.synthetic.main.tasks_act.*
 
 
@@ -83,11 +80,5 @@ class TasksActivity : AppCompatActivity() {
                 drawerLayout.closeDrawers()
                 true
             })
-
-    // TODO: Review this when implementing tests...
-    @VisibleForTesting
-    fun getCountingIdlingResource(): IdlingResource {
-        return EspressoIdlingResource.idlingResource
-    }
 
 }

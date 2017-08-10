@@ -18,13 +18,13 @@ sealed class TasksViewEvent {
     // - The UI events emitted should be UI centric.
     // - I think some amount of abstraction is okay. (Doesn't need to be 1-to-1 with android listeners)
 
-    data class TaskClick(val task: Task) : TasksViewEvent() // Doesn't concern the model as it is now.
+    data class TaskClick(val task: Task) : TasksViewEvent() // Should navigate to task detail.
 
-    data class TaskCheckBoxClick(val task: Task) : TasksViewEvent()
+    data class TaskCheckBoxClick(val task:Task, val checked: Boolean) : TasksViewEvent() // Should toggle 'done' state of a task.
 
-    data class FilterTypeSelected(val type: TasksFilterType) : TasksViewEvent()
+    data class FilterTypeSelected(val type: TasksFilterType) : TasksViewEvent() // Should filter list of tasks
 
-    object ClearCompletedTasksClick : TasksViewEvent()
+    object ClearCompletedTasksClick : TasksViewEvent() // Should archive 'done' tasks.
 
-    object RefreshTasksClick : TasksViewEvent()
+    object RefreshTasksClick : TasksViewEvent() // TODO: Remove this. Makes little sense in a reactive app.
 }

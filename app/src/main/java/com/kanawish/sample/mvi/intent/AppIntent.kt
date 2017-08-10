@@ -1,7 +1,7 @@
 package com.kanawish.sample.mvi.intent
 
-import com.kanawish.sample.mvi.model.TaskRepoState
 import com.kanawish.sample.mvi.model.Task
+import com.kanawish.sample.mvi.model.TaskRepoState
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.*
 import io.reactivex.ObservableTransformer
@@ -10,14 +10,14 @@ import io.reactivex.rxkotlin.ofType
 /**
  * Created on 2017-06-06.
  */
-sealed class AppIntent : (TaskRepoState) -> TaskRepoState {
+sealed class AppIntent() : (TaskRepoState) -> TaskRepoState {
 
     companion object {
         val tasksViewEventTransformer = ObservableTransformer<TasksViewEvent, AppIntent> { upstream ->
             upstream
                     .map({
                         when (it) {
-                            is TaskCheckBoxClick -> UpdateTask(oldTask = it.task, edit = toggleCompleted)
+                            is TaskCheckBoxClick -> UpdateTask(oldTask = it.task, edit = updateCompleted(it.checked))
                             is FilterTypeSelected -> TODO()
                             ClearCompletedTasksClick -> TODO()
                             RefreshTasksClick -> TODO()
@@ -28,6 +28,10 @@ sealed class AppIntent : (TaskRepoState) -> TaskRepoState {
         }
 
         private val toggleCompleted: (Task) -> Task = { task -> task.copy(completed = !task.completed) }
+        private fun updateCompleted(completed: Boolean): (Task) -> Task {
+            return { task -> task.copy(completed = completed) }
+        }
+
     }
 
     // Task List Operations

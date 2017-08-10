@@ -40,6 +40,14 @@ interface TaskRepo {
      */
     fun <T> taskAttribute(taskId: String, attributeMapper: (Task) -> T): Observable<T>
 
+    fun task(position: Int): Observable<Task>
+
+    fun <T> taskAttribute(position: Int, attributeMapper: (Task) -> T): Observable<T>
+
+    fun taskSource(id: String): BasicTaskRepo.TaskSource
+
+    fun taskSource(pos: Int): BasicTaskRepo.TaskSource
+
     /**
      * This returns an observable that reflects if the task repo is currently synchronizing.
      *

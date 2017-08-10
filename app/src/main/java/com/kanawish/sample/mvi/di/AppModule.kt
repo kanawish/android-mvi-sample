@@ -7,9 +7,6 @@ import com.kanawish.sample.mvi.model.repo.BasicTaskRepo
 import com.kanawish.sample.mvi.model.repo.local.TaskDb
 import toothpick.config.Module
 
-/**
- * Created on 2017-05-25.
- */
 class AppModule(appContext: Application) : Module() {
 
     init {

@@ -1,15 +1,18 @@
 package com.kanawish.sample.mvi
 
 import android.app.Application
-import com.kanawish.sample.mvi.di.AppModule
+import com.kanawish.sample.mvi.di.ToothpickLifecycle
+import com.kanawish.sample.mvi.di.openApplicationScope
+import com.kanawish.sample.mvi.model.repo.TaskRepo
 import com.squareup.leakcanary.LeakCanary
 import timber.log.Timber
 import toothpick.Toothpick
-import toothpick.smoothie.module.SmoothieApplicationModule
+import javax.inject.Inject
 
 /**
  */
-class MainApp : Application() {
+class TasksApp : Application() {
+    @Inject lateinit var taskRepo: TaskRepo
 
     override fun onCreate() {
         super.onCreate()
@@ -29,11 +32,8 @@ class MainApp : Application() {
         Timber.i("%s %d", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
 
         // DI Root Scope init
-        val appScope = Toothpick.openScope(this)
-        appScope.installModules(
-                SmoothieApplicationModule(this),
-                AppModule(this))
-
+        Toothpick.inject(this, openApplicationScope(this))
+        registerActivityLifecycleCallbacks(ToothpickLifecycle())
     }
 
 }

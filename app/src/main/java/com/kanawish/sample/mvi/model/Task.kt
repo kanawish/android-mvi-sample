@@ -16,3 +16,5 @@ data class Task(
         var description: String = "",
         var completed: Boolean = false
 )
+
+fun uuidStringToLong(uuidString:String) : Long = UUID.fromString(uuidString).mostSignificantBits and Long.MAX_VALUE

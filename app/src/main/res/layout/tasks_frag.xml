@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.kanawish.sample.mvi.view.tasks.ScrollChildSwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/refresh_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -43,10 +43,10 @@
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_marginBottom="@dimen/activity_vertical_margin" />
 
-            <ListView
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/tasks_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -82,5 +82,5 @@
 
         </LinearLayout>
     </RelativeLayout>
-</com.example.android.architecture.blueprints.todoapp.tasks.ScrollChildSwipeRefreshLayout>
+</com.kanawish.sample.mvi.view.tasks.ScrollChildSwipeRefreshLayout>
 
