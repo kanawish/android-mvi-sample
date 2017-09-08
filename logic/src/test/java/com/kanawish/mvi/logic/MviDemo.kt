@@ -5,9 +5,8 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.plusAssign
-import org.junit.AfterClass
-import org.junit.BeforeClass
 import org.junit.Test
+import timber.log.Timber
 
 // 01
 data class Model(val firstName: String = "", val lastName: String = "", val score: Int = 0)
@@ -97,7 +96,6 @@ class ViewImpl() : View {
 }
 
 
-
 // 06
 // Application Store
 
@@ -140,14 +138,19 @@ class MviDemo {
     @Test
     fun mviDemo() {
 
+        Timber.d("mviDemo()")
+
         // Next we wire up the components. Starting with Model -> View
         disposables += modelStore.model().subscribe(view::render)
 
         // We build the intent observable, View -> Intent
-        val intents: Observable<Intent> = view.viewEvents().toIntent()
+//        val intents: Observable<Intent> = view.viewEvents().toIntent()
 
         // And subscribe the Model, Intent -> Model
-        disposables += intents.subscribe(modelStore::apply)
+//        disposables += intents.subscribe(modelStore::apply)
+
+        // One-liner equivalent:
+        disposables += view.viewEvents().toIntent().subscribe(modelStore::apply)
 
         // Let's generate a series of view events to validate our implementation
         view.buttonClick()
@@ -161,6 +164,5 @@ class MviDemo {
 
         println("mviDemo() complete.")
     }
-
 
 }
