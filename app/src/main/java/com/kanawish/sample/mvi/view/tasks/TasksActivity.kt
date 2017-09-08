@@ -1,13 +1,21 @@
 package com.kanawish.sample.mvi.view.tasks
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import com.jakewharton.rxbinding2.support.design.widget.itemSelections
+import com.jakewharton.rxbinding2.view.clicks
 import com.kanawish.sample.mvi.R
+import com.kanawish.sample.mvi.model.repo.TaskRepo
 import com.kanawish.sample.mvi.util.ActivityUtils
+import com.kanawish.sample.mvi.view.addedittask.AddEditTaskActivity
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.tasks_act.*
+import javax.inject.Inject
 
 
 /**
@@ -16,6 +24,10 @@ import kotlinx.android.synthetic.main.tasks_act.*
  * TODO: refactor to idiomatic kotlin.
  */
 class TasksActivity : AppCompatActivity() {
+
+    @Inject lateinit var taskRepo: TaskRepo
+
+    val disposables = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +45,8 @@ class TasksActivity : AppCompatActivity() {
             setupDrawerContent(navView)
         }
 
+        fabAddTask.setImageResource(R.drawable.ic_add)
+
         var tasksFragment: TasksFragment =
                 supportFragmentManager.findFragmentById(R.id.contentFrame) as? TasksFragment ?:
                         TasksFragment.newInstance().also {
@@ -42,10 +56,37 @@ class TasksActivity : AppCompatActivity() {
 
         // TODO: Binding with MVI uni-dir flow. Probably will happen at start-stop stage.
 
-
         // Load previously saved state, if available.
         // TODO: TasksFilterType should be persisted at our model layer...
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        disposables += fabAddTask.clicks().subscribe { startActivity(Intent(this, AddEditTaskActivity::class.java)) }
+
+        navView?.itemSelections()?.subscribe(this::handleItemSelection)?.let(disposables::add)
+
+    }
+
+    private fun handleItemSelection(menuItem: MenuItem) {
+        when (menuItem.itemId) {
+            R.id.list_navigation_menu_item -> {
+            }
+            R.id.statistics_navigation_menu_item -> {
+                //                        val intent = Intent(this@TasksActivity, StatisticsActivity::class.java)
+                //                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                //                        startActivity(intent)
+            }
+        }
+        menuItem.isChecked = true
+        drawerLayout.closeDrawers()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        disposables.clear()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -56,29 +97,32 @@ class TasksActivity : AppCompatActivity() {
                 return true
             }
         }
+
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setupDrawerContent(navigationView: NavigationView) =
-            navigationView.setNavigationItemSelectedListener({ menuItem ->
-                when (menuItem.itemId) {
-                    R.id.list_navigation_menu_item -> {
-                        // Nothing to do, we're on the list screen already.
-                    }
-                    R.id.statistics_navigation_menu_item -> {
-                        // TODO: Re-enable once that screen is available.
-/*
-                        val intent = Intent(this@TasksActivity, StatisticsActivity::class.java)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        startActivity(intent)
-*/
-                    }
-                }
+    private fun setupDrawerContent(navigationView: NavigationView) {
 
-                // Close the navigation drawer when an item is selected.
-                menuItem.isChecked = true
-                drawerLayout.closeDrawers()
-                true
-            })
+        navigationView.setNavigationItemSelectedListener({ menuItem ->
+            when (menuItem.itemId) {
+                R.id.list_navigation_menu_item -> {
+                    // Nothing to do, we're on the list screen already.
+                }
+                R.id.statistics_navigation_menu_item -> {
+                    // TODO: Re-enable once that screen is available.
+                    /*
+                                            val intent = Intent(this@TasksActivity, StatisticsActivity::class.java)
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                            startActivity(intent)
+                    */
+                }
+            }
+
+            // Close the navigation drawer when an item is selected.
+            menuItem.isChecked = true
+            drawerLayout.closeDrawers()
+            true
+        })
+    }
 
 }

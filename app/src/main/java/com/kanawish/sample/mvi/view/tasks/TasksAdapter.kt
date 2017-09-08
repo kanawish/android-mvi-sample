@@ -13,13 +13,14 @@ class TasksAdapter @Inject constructor(val inflater: LayoutInflater, val taskRep
 
     var tasks: List<Task> = emptyList()
 
+    // TODO: Hook up this disposable to be part of the overall activity lifecycle
+    val disposable = taskRepo.tasks().subscribe {
+        tasks = it
+        notifyDataSetChanged()
+    }
+
     init {
         setHasStableIds(true)
-
-        taskRepo.tasks().subscribe {
-            tasks = it
-            notifyDataSetChanged()
-        }
     }
 
     override fun getItemCount(): Int = tasks.size
