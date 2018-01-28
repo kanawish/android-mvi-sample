@@ -4,12 +4,11 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    compileSdkVersion 27
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
 
@@ -25,21 +24,22 @@ android {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.4-2"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:1.2.21"
 
     // Timber Logging API: Better method signatures, easy log-level-by-flavor management, decent lint checks, etc.
     // https://github.com/JakeWharton/timber
-    api "com.jakewharton.timber:timber:4.5.1" // https://github.com/JakeWharton/timber/blob/master/CHANGELOG.md
+    api "com.jakewharton.timber:timber:4.6.0" // https://github.com/JakeWharton/timber/blob/master/CHANGELOG.md
 
     // Functional Programming Support
     api "org.funktionale:funktionale-all:1.1" // https://github.com/MarioAriasC/funKTionale/releases
 
     // DI
-    api "com.github.stephanenicolas.toothpick:toothpick-runtime:1.0.6"
-    api "com.github.stephanenicolas.toothpick:smoothie:1.0.6"
+    kapt "com.github.stephanenicolas.toothpick:toothpick-compiler:1.1.1" // https://github.com/stephanenicolas/toothpick/blob/master/CHANGELOG.md
+    api "com.github.stephanenicolas.toothpick:toothpick-runtime:1.1.1"
+    api "com.github.stephanenicolas.toothpick:smoothie:1.1.1"
 
     // RxJava 2 for your declarative programming needs
-    api "io.reactivex.rxjava2:rxjava:2.1.2" // https://github.com/ReactiveX/RxJava/blob/2.x/CHANGES.md
+    api "io.reactivex.rxjava2:rxjava:2.1.5" // https://github.com/ReactiveX/RxJava/blob/2.x/CHANGES.md
     api "io.reactivex.rxjava2:rxkotlin:2.1.0" // https://github.com/ReactiveX/RxKotlin/releases
     api "com.jakewharton.rxrelay2:rxrelay:2.0.0" // https://github.com/JakeWharton/RxRelay/blob/master/CHANGELOG.md
 

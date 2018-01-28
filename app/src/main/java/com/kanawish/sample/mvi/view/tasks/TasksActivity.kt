@@ -9,7 +9,7 @@ import android.view.MenuItem
 import com.jakewharton.rxbinding2.support.design.widget.itemSelections
 import com.jakewharton.rxbinding2.view.clicks
 import com.kanawish.sample.mvi.R
-import com.kanawish.sample.mvi.model.repo.TaskRepo
+import com.kanawish.sample.mvi.model.Model
 import com.kanawish.sample.mvi.util.ActivityUtils
 import com.kanawish.sample.mvi.view.addedittask.AddEditTaskActivity
 import io.reactivex.disposables.CompositeDisposable
@@ -25,7 +25,7 @@ import javax.inject.Inject
  */
 class TasksActivity : AppCompatActivity() {
 
-    @Inject lateinit var taskRepo: TaskRepo
+    @Inject lateinit var model: Model
 
     val disposables = CompositeDisposable()
 
@@ -57,7 +57,7 @@ class TasksActivity : AppCompatActivity() {
         // TODO: Binding with MVI uni-dir flow. Probably will happen at start-stop stage.
 
         // Load previously saved state, if available.
-        // TODO: TasksFilterType should be persisted at our model layer...
+        // TODO: FilterType should be persisted at our model layer...
 
     }
 

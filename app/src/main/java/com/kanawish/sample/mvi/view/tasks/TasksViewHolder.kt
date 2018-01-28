@@ -7,7 +7,7 @@ import android.widget.TextView
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.checkedChanges
 import com.kanawish.sample.mvi.R
-import com.kanawish.sample.mvi.intent.AppIntent
+import com.kanawish.sample.mvi.intent.Intent
 import com.kanawish.sample.mvi.model.Task
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -18,7 +18,7 @@ class TasksViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     val disposables = CompositeDisposable()
 
-    fun bind(task: Task, intentConsumer: (AppIntent) -> Unit) {
+    fun bind(task: Task, intentConsumer: (Intent) -> Unit) {
 
         with(task) {
             titleView.text = title
@@ -29,12 +29,12 @@ class TasksViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         disposables += checkBox.checkedChanges()
                 .map { TasksViewEvent.TaskCheckBoxClick(task, it) }
-                .compose(AppIntent.tasksViewEventTransformer)
+                .compose(Intent.tasksViewEventTransformer)
                 .subscribe(intentConsumer)
 
         disposables += titleView.clicks()
                 .map { TasksViewEvent.TaskClick(task) }
-                .compose(AppIntent.tasksViewEventTransformer)
+                .compose(Intent.tasksViewEventTransformer)
                 .subscribe(intentConsumer)
     }
 

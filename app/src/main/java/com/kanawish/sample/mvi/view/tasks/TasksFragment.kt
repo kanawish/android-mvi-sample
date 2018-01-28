@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.kanawish.sample.mvi.R
-import com.kanawish.sample.mvi.model.repo.TaskRepo
+import com.kanawish.sample.mvi.model.Model
 import kotlinx.android.synthetic.main.tasks_frag.*
 import toothpick.Toothpick
 import javax.inject.Inject
@@ -17,7 +17,7 @@ import javax.inject.Inject
  */
 class TasksFragment : Fragment() {
 
-    @Inject lateinit var taskRepo: TaskRepo
+    @Inject lateinit var model: Model
 
     @Inject lateinit var tasksAdapter: TasksAdapter
 

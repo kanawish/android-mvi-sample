@@ -9,21 +9,24 @@ import org.junit.Test
 import timber.log.Timber
 
 // 01
-data class Model(val firstName: String = "", val lastName: String = "", val score: Int = 0)
+data class Player(
+        val firstName: String = "",
+        val lastName: String = "",
+        val score: Int = 0)
 
-interface ModelStore {
+interface Model {
+    // Player producer
+    fun player(): Observable<Player>
+
     // Intent consumer
-    fun apply(intent: Intent)
-
-    // Model producer
-    fun model(): Observable<Model>
+    fun accept(intent: Intent)
 }
 
 
 // 02
 interface View {
-    // Model consumer
-    fun render(model: Model)
+    // Player consumer
+    fun render(player: Player)
 
     // View Event producer
     fun viewEvents(): Observable<ViewEvent>
@@ -37,7 +40,7 @@ sealed class ViewEvent {
 
 
 // 03
-sealed class Intent(val reducer: (Model) -> Model) {
+sealed class Intent(val reducer: (Player) -> Player) {
 
     class IncrementScoreIntent(increment: Int = 1) : Intent({
         it.copy(score = it.score + increment)
@@ -68,8 +71,8 @@ fun Observable<ViewEvent>.toIntent(): Observable<Intent> =
 class ViewImpl() : View {
     private val viewEvents: PublishRelay<ViewEvent> = PublishRelay.create<ViewEvent>()
 
-    override fun render(model: Model) {
-        println("View.render():\t${model.firstName}, ${model.lastName}: ${model.score} pts.\n")
+    override fun render(player: Player) {
+        println("View.render():\t${player.firstName}, ${player.lastName}: ${player.score} pts.\n")
     }
 
     override fun viewEvents(): Observable<ViewEvent> {
@@ -99,36 +102,34 @@ class ViewImpl() : View {
 // 06
 // Application Store
 
-class ModelStoreImpl : ModelStore {
+class ModelImpl : Model {
 
     private val intents: PublishRelay<Intent> = PublishRelay.create<Intent>()
 
-    override fun apply(intent: Intent) {
+    override fun accept(intent: Intent) {
         intents.accept(intent)
     }
 
+    private lateinit var storeDisposable: Disposable
 
-    private val store: Observable<Model> = intents
+    private val store: Observable<Player> = intents
             .doOnNext { println("Intent:\t\t${it.javaClass.simpleName}") }
             .map { it.reducer }
-            .scan(Model("Bob", "L'Eponge", 0), { old, reducer -> reducer.invoke(old) })
-            .doOnNext { println("Model:\t\t${it.firstName}, ${it.lastName}: ${it.score} pts.") }
+            .scan(Player("Bob", "L'Eponge", 0), { old, reducer -> reducer.invoke(old) })
+            .doOnNext { println("Player:\t\t${it.firstName}, ${it.lastName}: ${it.score} pts.") }
             .replay(1)
             .apply { storeDisposable = connect() }
 
-    private lateinit var storeDisposable: Disposable
 
     // NOTE: As we further explore the MVI pattern, we'll create more targeted Observable streams.
-    override fun model(): Observable<Model> {
-        return store
-    }
+    override fun player(): Observable<Player> = store.hide()
 
 }
 
 // 07
 class MviDemo {
 
-    val modelStore = ModelStoreImpl()
+    val modelStore = ModelImpl()
 
     val view = ViewImpl()
 
@@ -140,17 +141,17 @@ class MviDemo {
 
         Timber.d("mviDemo()")
 
-        // Next we wire up the components. Starting with Model -> View
-        disposables += modelStore.model().subscribe(view::render)
+        // Next we wire up the components. Starting with Player -> View
+        disposables += modelStore.player().subscribe(view::render)
 
         // We build the intent observable, View -> Intent
 //        val intents: Observable<Intent> = view.viewEvents().toIntent()
 
-        // And subscribe the Model, Intent -> Model
-//        disposables += intents.subscribe(modelStore::apply)
+        // And subscribe the Player, Intent -> Player
+//        disposables += intents.subscribe(modelStore::accept)
 
         // One-liner equivalent:
-        disposables += view.viewEvents().toIntent().subscribe(modelStore::apply)
+        disposables += view.viewEvents().toIntent().subscribe(modelStore::accept)
 
         // Let's generate a series of view events to validate our implementation
         view.buttonClick()

@@ -5,16 +5,16 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.model.Task
-import com.kanawish.sample.mvi.model.repo.TaskRepo
-import com.kanawish.sample.mvi.model.uuidStringToLong
+import com.kanawish.sample.mvi.model.Model
+import java.util.*
 import javax.inject.Inject
 
-class TasksAdapter @Inject constructor(val inflater: LayoutInflater, val taskRepo: TaskRepo) : RecyclerView.Adapter<TasksViewHolder>() {
+class TasksAdapter @Inject constructor(val inflater: LayoutInflater, val model: Model) : RecyclerView.Adapter<TasksViewHolder>() {
 
     var tasks: List<Task> = emptyList()
 
     // TODO: Hook up this disposable to be part of the overall activity lifecycle
-    val disposable = taskRepo.tasks().subscribe {
+    val disposable = model.tasks().subscribe {
         tasks = it
         notifyDataSetChanged()
     }
@@ -30,7 +30,7 @@ class TasksAdapter @Inject constructor(val inflater: LayoutInflater, val taskRep
     }
 
     override fun onBindViewHolder(holder: TasksViewHolder, position: Int) {
-        holder.bind(tasks[position], taskRepo::process)
+        holder.bind(tasks[position], model::accept)
     }
 
     override fun onViewRecycled(holder: TasksViewHolder) {
@@ -41,4 +41,6 @@ class TasksAdapter @Inject constructor(val inflater: LayoutInflater, val taskRep
         return uuidStringToLong(tasks[i].id)
     }
 
+    // Could eventually lead to id collisions?
+    private fun uuidStringToLong(uuidString: String): Long = UUID.fromString(uuidString).mostSignificantBits and Long.MAX_VALUE
 }

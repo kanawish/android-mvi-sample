@@ -11,9 +11,9 @@ Target audience include, but not limited to:
 
 Here are some articles/examples explaining the core principles of MVI and unidirectional flow:
 
-- http://hannesdorfmann.com/android/model-view-intent
-- https://cycle.js.org/model-view-intent.html
-- http://thenewstack.io/developers-need-know-mvi-model-view-intent/
+- http://hannesdorfmann.com/android/player-view-intent
+- https://cycle.js.org/player-view-intent.html
+- http://thenewstack.io/developers-need-know-mvi-player-view-intent/
 - http://blog.danlew.net/2017/07/27/an-introduction-to-functional-reactive-programming/
 
 This project, while based off of Google's architectural samples repo, is my 
