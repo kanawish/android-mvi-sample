@@ -14,7 +14,10 @@ import com.kanawish.sample.mvi.util.ActivityUtils
 import com.kanawish.sample.mvi.view.addedittask.AddEditTaskActivity
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import kotlinx.android.synthetic.main.tasks_act.*
+import kotlinx.android.synthetic.main.tasks_act.drawerLayout
+import kotlinx.android.synthetic.main.tasks_act.fabAddTask
+import kotlinx.android.synthetic.main.tasks_act.navView
+import kotlinx.android.synthetic.main.tasks_act.toolbar
 import javax.inject.Inject
 
 
@@ -25,7 +28,8 @@ import javax.inject.Inject
  */
 class TasksActivity : AppCompatActivity() {
 
-    @Inject lateinit var model: Model
+    @Inject
+    lateinit var model: Model
 
     val disposables = CompositeDisposable()
 
@@ -47,12 +51,11 @@ class TasksActivity : AppCompatActivity() {
 
         fabAddTask.setImageResource(R.drawable.ic_add)
 
-        var tasksFragment: TasksFragment =
-                supportFragmentManager.findFragmentById(R.id.contentFrame) as? TasksFragment ?:
-                        TasksFragment.newInstance().also {
-                            ActivityUtils.addFragmentToActivity(
-                                    supportFragmentManager, it, R.id.contentFrame)
-                        }
+        var tasksFragment: TasksFragment = supportFragmentManager.findFragmentById(R.id.contentFrame) as? TasksFragment
+                ?: TasksFragment.newInstance().also {
+                    ActivityUtils.addFragmentToActivity(
+                            supportFragmentManager, it, R.id.contentFrame)
+                }
 
         // TODO: Binding with MVI uni-dir flow. Probably will happen at start-stop stage.
 
@@ -64,7 +67,9 @@ class TasksActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        disposables += fabAddTask.clicks().subscribe { startActivity(Intent(this, AddEditTaskActivity::class.java)) }
+        disposables += fabAddTask
+                .clicks()
+                .subscribe { startActivity(Intent(this, AddEditTaskActivity::class.java)) }
 
         navView?.itemSelections()?.subscribe(this::handleItemSelection)?.let(disposables::add)
 

@@ -8,38 +8,37 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.widget.checkedChanges
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.intent.Intent
+import com.kanawish.sample.mvi.intent.toIntent
 import com.kanawish.sample.mvi.model.Task
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 
-class TasksViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    val checkBox: CheckBox = itemView.findViewById(R.id.complete)
-    val titleView: TextView = itemView.findViewById(R.id.title)
+class TasksViewHolder(itemView: View, intentConsumer: (Intent) -> Unit) : RecyclerView.ViewHolder(itemView) {
+    private val checkBox: CheckBox = itemView.findViewById(R.id.complete)
+    private val titleView: TextView = itemView.findViewById(R.id.title)
 
-    val disposables = CompositeDisposable()
+    private val disposables = CompositeDisposable()
 
-    fun bind(task: Task, intentConsumer: (Intent) -> Unit) {
+    lateinit var boundTask: Task
 
-        with(task) {
-            titleView.text = title
-            checkBox.isChecked = completed
-        }
-
-        disposables.clear()
-
+    init {
         disposables += checkBox.checkedChanges()
-                .map { TasksViewEvent.TaskCheckBoxClick(task, it) }
-                .compose(Intent.tasksViewEventTransformer)
+                .map<TasksViewEvent> { TasksViewEvent.TaskCheckBoxClick(boundTask, it) }
+                .toIntent()
                 .subscribe(intentConsumer)
 
         disposables += titleView.clicks()
-                .map { TasksViewEvent.TaskClick(task) }
-                .compose(Intent.tasksViewEventTransformer)
+                .map<TasksViewEvent> { TasksViewEvent.TaskClick(boundTask) }
+                .toIntent()
                 .subscribe(intentConsumer)
     }
 
-    fun unbind() {
-        disposables.clear()
+    fun bind(task: Task) {
+        // Binds task after applying view changes.
+        boundTask = task.apply {
+            titleView.text = title
+            checkBox.isChecked = completed
+        }
     }
 
 }

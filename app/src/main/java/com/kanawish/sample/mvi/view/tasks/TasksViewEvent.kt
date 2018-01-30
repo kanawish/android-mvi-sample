@@ -8,7 +8,7 @@ import com.kanawish.sample.mvi.model.FilterType
  */
 sealed class TasksViewEvent {
 
-    object RefreshTasksClick : TasksViewEvent() // Pull to refresh / refresh button
+    object RefreshTasksPulled : TasksViewEvent() // Pull to refresh / refresh button
 
     data class TaskClick(val task: Task) : TasksViewEvent() // Should navigate to task detail.
 

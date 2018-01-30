@@ -1,7 +1,7 @@
 package com.kanawish.sample.mvi
 
 import android.app.Application
-import com.kanawish.sample.mvi.di.ToothpickLifecycle
+import com.kanawish.sample.mvi.di.ToothpickActivityLifecycleCallbacks
 import com.kanawish.sample.mvi.di.openApplicationScope
 import com.kanawish.sample.mvi.model.Model
 import com.squareup.leakcanary.LeakCanary
@@ -33,7 +33,7 @@ class TasksApp : Application() {
 
         // DI Root Scope init
         Toothpick.inject(this, openApplicationScope(this))
-        registerActivityLifecycleCallbacks(ToothpickLifecycle())
+        registerActivityLifecycleCallbacks(ToothpickActivityLifecycleCallbacks())
     }
 
 }

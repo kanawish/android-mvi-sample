@@ -4,9 +4,10 @@ import com.kanawish.sample.mvi.model.Task
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.ClearCompletedTasksClick
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.FilterTypeSelected
-import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.RefreshTasksClick
+import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.RefreshTasksPulled
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.TaskCheckBoxClick
-import io.reactivex.ObservableTransformer
+import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.TaskClick
+import io.reactivex.Observable
 import io.reactivex.rxkotlin.ofType
 
 /**
@@ -18,21 +19,7 @@ sealed class Intent() {
         /**
          * For each view event groups (tasks, task, etc) define a transformer to map XYYViewEvent to Intent
          */
-        val tasksViewEventTransformer = ObservableTransformer<TasksViewEvent, Intent> { upstream ->
-            upstream
-                    .map({
-                        when (it) {
-                            is TaskCheckBoxClick -> UpdateTask(oldTask = it.task, edit = updateCompleted(it.checked))
-                            is FilterTypeSelected -> TODO()
-                            ClearCompletedTasksClick -> TODO()
-                            RefreshTasksClick -> TODO()
-                            else -> Unit // Not all view events transform to AppIntents.
-                        }
-                    })
-                    .ofType<Intent>() // Filters out 'Unit'
-        }
-
-        private fun updateCompleted(completed: Boolean): (Task) -> Task = { task -> task.copy(completed = completed) }
+        fun updateCompleted(completed: Boolean): (Task) -> Task = { task -> task.copy(completed = completed) }
     }
 
     object Refresh : Intent()
@@ -43,4 +30,18 @@ sealed class Intent() {
 
     data class DeleteTask(val task: Task) : Intent()
 
+}
+
+fun Observable<TasksViewEvent>.toIntent(): Observable<Intent> {
+    return this
+            .map { tasksViewEvent ->
+                when (tasksViewEvent) {
+                    RefreshTasksPulled -> Intent.Refresh
+                    is FilterTypeSelected -> TODO()
+                    is TaskCheckBoxClick -> Intent.UpdateTask(oldTask = tasksViewEvent.task, edit = Intent.updateCompleted(tasksViewEvent.checked))
+                    is TaskClick -> TODO()
+                    ClearCompletedTasksClick -> TODO()
+                }
+            }
+            .ofType() // Filters out 'Unit'
 }
