@@ -37,7 +37,9 @@ enum class FilterType {
  * Represents the app's current synchronization state.
  */
 sealed class SyncState {
-    object IDLE : SyncState()
+    object IDLE : SyncState() {
+        override fun toString(): String = "IDLE"
+    }
 
     data class PROCESS(val type: Type) : SyncState() {
         enum class Type {

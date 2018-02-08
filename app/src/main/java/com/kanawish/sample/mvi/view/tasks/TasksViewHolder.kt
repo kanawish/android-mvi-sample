@@ -10,35 +10,49 @@ import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.intent.Intent
 import com.kanawish.sample.mvi.intent.toIntent
 import com.kanawish.sample.mvi.model.Task
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 
-class TasksViewHolder(itemView: View, intentConsumer: (Intent) -> Unit) : RecyclerView.ViewHolder(itemView) {
+class TasksViewHolder(
+        itemView: View,
+        private val intentConsumer: (Intent) -> Unit
+) : RecyclerView.ViewHolder(itemView) {
+
+    // NOTE: I believe we can't use kotlin's synthetic accessors. (Double check)
     private val checkBox: CheckBox = itemView.findViewById(R.id.complete)
     private val titleView: TextView = itemView.findViewById(R.id.title)
 
     private val disposables = CompositeDisposable()
 
-    lateinit var boundTask: Task
-
-    init {
-        disposables += checkBox.checkedChanges()
-                .map<TasksViewEvent> { TasksViewEvent.TaskCheckBoxClick(boundTask, it) }
+    private fun checkBoxChanges(task: Task): Observable<Intent> {
+        return checkBox
+                .checkedChanges()
+                .skipInitialValue()
+                .map<TasksViewEvent> { checked ->
+                    TasksViewEvent.TaskCheckBoxClick(task, checked)
+                }
                 .toIntent()
-                .subscribe(intentConsumer)
-
-        disposables += titleView.clicks()
-                .map<TasksViewEvent> { TasksViewEvent.TaskClick(boundTask) }
-                .toIntent()
-                .subscribe(intentConsumer)
     }
 
+    private fun titleViewClicks(task: Task): Observable<Intent> {
+        return titleView
+                .clicks()
+                .map<TasksViewEvent> { TasksViewEvent.TaskClick(task) }
+                .toIntent()
+    }
+
+    // TODO: Evaluate performance costs of on bind/unbind.
     fun bind(task: Task) {
+        // NOTE: This is important to avoid triggering intents on re-bind.
+        disposables.clear()
+
         // Binds task after applying view changes.
-        boundTask = task.apply {
-            titleView.text = title
-            checkBox.isChecked = completed
-        }
+        titleView.text = task.title
+        checkBox.isChecked = task.completed
+
+        disposables += checkBoxChanges(task).subscribe(intentConsumer)
+        disposables += titleViewClicks(task).subscribe(intentConsumer)
     }
 
 }
