@@ -1,4 +1,4 @@
-package com.kanawish.mvi.logic
+package com.kanawish.sample
 
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
@@ -57,14 +57,18 @@ sealed class Intent(val reducer: (Player) -> Player) {
 }
 
 // 04
-fun Observable<ViewEvent>.toIntent(): Observable<Intent> =
-        map {
-            when (it) {
-                is ViewEvent.FirstNameFieldChange -> Intent.EditFirstNameIntent(it.change)
-                is ViewEvent.LastNameFieldChange -> Intent.EditLastNameIntent(it.change)
-                ViewEvent.IncrementScoreClick -> Intent.IncrementScoreIntent()
-            }
+fun Observable<ViewEvent>.toIntent(): Observable<Intent> {
+    return map {
+        when (it) {
+            is ViewEvent.FirstNameFieldChange ->
+                Intent.EditFirstNameIntent(it.change)
+            is ViewEvent.LastNameFieldChange ->
+                Intent.EditLastNameIntent(it.change)
+            ViewEvent.IncrementScoreClick ->
+                Intent.IncrementScoreIntent()
         }
+    }
+}
 
 
 // 05

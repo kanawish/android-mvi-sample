@@ -30,9 +30,10 @@ class TasksAdapter @Inject constructor(
         // If this stayed alive, it means we'd leak eventually, right?
         disposable = model
                 .tasks()
-                .subscribe {
-                    Timber.i("TaskAdapter received new tasks list of size ${it.size}.")
-                    tasks = it
+                .subscribe { newTasks ->
+                    Timber.i("TaskAdapter received new tasks list of size ${newTasks.size}.")
+                    tasks = newTasks
+
                     // Simplistic approach, forces a rebind for all visible viewHolders.
                     notifyDataSetChanged()
                 }

@@ -27,7 +27,7 @@ data class Task(
  */
 enum class FilterType {
     ANY,            // Do not filter tasks.
-    INCOMPLETE,     // Filters only the active (not completed yet) tasks.
+    ACTIVE,     // Filters only the active (not completed yet) tasks.
     COMPLETE        // Filters only the completed tasks.
 }
 

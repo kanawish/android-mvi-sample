@@ -10,13 +10,15 @@ import com.jakewharton.rxbinding2.support.v4.widget.refreshing
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.intent.toIntent
 import com.kanawish.sample.mvi.model.Model
-import com.kanawish.sample.mvi.model.SyncState
+import com.kanawish.sample.mvi.model.ViewModel
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import kotlinx.android.synthetic.main.tasks_frag.noTasks
-import kotlinx.android.synthetic.main.tasks_frag.refresh_layout
-import kotlinx.android.synthetic.main.tasks_frag.tasks_list
-import timber.log.Timber
+import kotlinx.android.synthetic.main.tasks_frag.noTasksIconIV
+import kotlinx.android.synthetic.main.tasks_frag.noTasksLL
+import kotlinx.android.synthetic.main.tasks_frag.noTasksMainTV
+import kotlinx.android.synthetic.main.tasks_frag.swipeRefreshLayout
+import kotlinx.android.synthetic.main.tasks_frag.tasksLL
+import kotlinx.android.synthetic.main.tasks_frag.tasksRV
 import javax.inject.Inject
 
 /**
@@ -25,12 +27,16 @@ import javax.inject.Inject
 class TasksFragment : Fragment() {
 
     @Inject
+    lateinit var viewModel: ViewModel
+
+    // TODO: Replace with intent layer consumer?
+    @Inject
     lateinit var model: Model
 
     @Inject
     lateinit var tasksAdapter: TasksAdapter
 
-    val disposables = CompositeDisposable()
+    private val disposables = CompositeDisposable()
 
     companion object {
         fun newInstance(): TasksFragment {
@@ -38,50 +44,49 @@ class TasksFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-            inflater.inflate(R.layout.tasks_frag, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.tasks_frag, container, false)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        tasks_list.adapter = tasksAdapter
+        tasksRV.adapter = tasksAdapter
     }
 
     override fun onResume() {
         super.onResume()
 
-        // TODO: Add timeout handling?
         // MODEL(INTENT)
         // TasksViewEvent -> Intent
-        disposables += refresh_layout
-                .refreshes()
+        disposables += swipeRefreshLayout.refreshes()
                 .map<TasksViewEvent> { TasksViewEvent.RefreshTasksPulled }
-                .doOnNext { Timber.i("TasksViewEvent.RefreshTasksPulled") }
                 .toIntent()
                 .subscribe(model::accept)
 
         // VIEW(MODEL)
-        // Show progress indicator if a sync is in progress, hide otherwise.
-        disposables += model.syncState()
-                .map { it is SyncState.PROCESS }
-                .doOnNext { Timber.i("SyncState is PROCESS? $it") }
-                .subscribe(refresh_layout.refreshing())
 
-        disposables += model.tasks()
-                // TODO: Add ViewModel concept
-                .map {
-                    if (it.size > 0) {
-                        View.GONE
-                    } else {
-                        View.VISIBLE
-                    }
+        // Shows progress indicator if a sync is in progress, hide otherwise.
+        disposables += viewModel.refreshing().subscribe(swipeRefreshLayout.refreshing())
+
+        // Flips between empty state and recyclerView
+        disposables += viewModel.contentVisibility()
+                .subscribe { (tasksLLVisibility, noTasksLLVisibility) ->
+                    tasksLL.visibility = tasksLLVisibility
+                    noTasksLL.visibility = noTasksLLVisibility
                 }
-                .subscribe { noTasks.visibility = it }
 
-        // TODO: Bind to intent (intent observers the view as a source.)
+        // Change empty state to reflect selected filter, *when needed only*
+        disposables += viewModel.noTasksMap()
+                .subscribe { (descriptionRes, iconRes) ->
+                    noTasksMainTV.setText(descriptionRes)
+                    noTasksIconIV.setImageResource(iconRes) // Could be improved here.
+                }
+
     }
 
     override fun onPause() {
         super.onPause()
-        // TODO: Unbind intent (intent disposes of observed view.)
+
+        disposables.dispose()
     }
 
 }
