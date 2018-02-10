@@ -27,7 +27,7 @@ interface Model {
     /**
      * This observable emits the complete list of tasks every time changes occur to it.
      */
-    fun tasks(filtered: Boolean = false): Observable<List<Task>>
+    fun tasks(filtered: Boolean = true): Observable<List<Task>>
 
     /**
      * This returns an observable that tracks changes to the task matching the provided Id.

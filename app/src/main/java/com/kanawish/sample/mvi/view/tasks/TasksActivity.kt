@@ -14,10 +14,7 @@ import com.kanawish.sample.mvi.util.ActivityUtils
 import com.kanawish.sample.mvi.view.addedittask.AddEditTaskActivity
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import kotlinx.android.synthetic.main.tasks_act.drawerLayout
-import kotlinx.android.synthetic.main.tasks_act.fabAddTask
-import kotlinx.android.synthetic.main.tasks_act.navView
-import kotlinx.android.synthetic.main.tasks_act.toolbar
+import kotlinx.android.synthetic.main.tasks_act.*
 import javax.inject.Inject
 
 
@@ -44,30 +41,25 @@ class TasksActivity : AppCompatActivity() {
 
         // Set up the navigation drawer.
         drawerLayout.setStatusBarBackground(R.color.colorPrimaryDark)
-
         if (navView != null) {
             setupDrawerContent(navView)
         }
 
-        fabAddTask.setImageResource(R.drawable.ic_add)
+        addTaskFAB.setImageResource(R.drawable.ic_add)
 
-        var tasksFragment: TasksFragment = supportFragmentManager.findFragmentById(R.id.contentFrame) as? TasksFragment
-                ?: TasksFragment.newInstance().also {
+        // TODO: Find the problem with fragment lifecycle in this current sample...
+        var tasksFragment: TasksFragment = supportFragmentManager.findFragmentById(R.id.contentFrame) as? TasksFragment ?:
+                TasksFragment.newInstance().also {
                     ActivityUtils.addFragmentToActivity(
                             supportFragmentManager, it, R.id.contentFrame)
                 }
-
-        // TODO: Binding with MVI uni-dir flow. Probably will happen at start-stop stage.
-
-        // Load previously saved state, if available.
-        // TODO: FilterType should be persisted at our model layer...
 
     }
 
     override fun onResume() {
         super.onResume()
 
-        disposables += fabAddTask
+        disposables += addTaskFAB
                 .clicks()
                 .subscribe { startActivity(Intent(this, AddEditTaskActivity::class.java)) }
 

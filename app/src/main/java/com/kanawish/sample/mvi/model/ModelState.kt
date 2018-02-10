@@ -25,10 +25,10 @@ data class Task(
 /**
  * Used with the filter spinner in the tasks list.
  */
-enum class FilterType {
-    ANY,            // Do not filter tasks.
-    ACTIVE,     // Filters only the active (not completed yet) tasks.
-    COMPLETE        // Filters only the completed tasks.
+enum class FilterType(val predicate: (Task) -> Boolean) {
+    ANY({ _ -> true }),            // Do not filter tasks.
+    ACTIVE({ task -> !task.completed }),     // Filters only the active (not completed yet) tasks.
+    COMPLETE({ task -> task.completed })        // Filters only the completed tasks.
 }
 
 /**

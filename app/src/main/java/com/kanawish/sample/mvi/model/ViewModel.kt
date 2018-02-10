@@ -3,6 +3,7 @@ package com.kanawish.sample.mvi.model
 import android.view.View
 import com.kanawish.sample.mvi.R
 import io.reactivex.Observable
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,6 +22,7 @@ class ViewModel @Inject constructor(val model: Model) {
     fun refreshing(): Observable<Boolean> {
         return model.syncState()
                 .map { it is SyncState.PROCESS }
+                .doOnNext { Timber.i("refreshing $it") }
     }
 
     /**
@@ -29,9 +31,9 @@ class ViewModel @Inject constructor(val model: Model) {
     fun filterDescription(): Observable<Int> {
         return model.filter().map {
             when (it) {
-                FilterType.ANY -> R.string.nav_all
-                FilterType.ACTIVE -> R.string.nav_active
-                FilterType.COMPLETE -> R.string.nav_completed
+                FilterType.ANY -> R.string.label_all
+                FilterType.ACTIVE -> R.string.label_active
+                FilterType.COMPLETE -> R.string.label_completed
             }
         }
     }

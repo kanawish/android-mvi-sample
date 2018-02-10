@@ -69,6 +69,13 @@ dependencies {
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:1.5.4"
     testImplementation "com.squareup.leakcanary:leakcanary-android-no-op:1.5.4"
 
+    // Dependencies for local unit tests
     testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-android:2.8.47'
+
+    // Android Testing Support Library's runner and rules
+    androidTestImplementation "com.android.support.test:runner:1.0.1"
+    androidTestImplementation "com.android.support.test:rules:1.0.1"
+
 
 }

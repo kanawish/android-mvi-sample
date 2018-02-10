@@ -2,8 +2,8 @@ package com.kanawish.sample.mvi.model
 
 import com.jakewharton.rxrelay2.PublishRelay
 import com.kanawish.sample.mvi.intent.Intent
-import com.kanawish.sample.mvi.intent.ReducerIntent
 import com.kanawish.sample.mvi.intent.ObservableIntent
+import com.kanawish.sample.mvi.intent.ReducerIntent
 import com.kanawish.sample.mvi.model.SyncState.IDLE
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -34,22 +34,30 @@ class BasicModel : Model {
             .replay(1)
             .apply { storeDisposable = connect() }
 
-    init {
-    }
-
     override fun syncState(): Observable<SyncState> = store.map(ModelState::syncState)
 
     override fun filter(): Observable<FilterType> = store.map(ModelState::filter)
 
     override fun tasks(filtered: Boolean): Observable<List<Task>> {
-        return store.map(ModelState::tasks).distinctUntilChanged()
+        return if (filtered)
+            filteredTasks()
+        else
+            store.map(ModelState::tasks).distinctUntilChanged()
+    }
+
+    private fun filteredTasks(): Observable<List<Task>> {
+        return store
+                .map { it.tasks.filter(it.filter.predicate) }
+                .distinctUntilChanged()
     }
 
     override fun task(taskId: String): Observable<Task> {
-        return tasks().concatMap { tasks -> tasks.filter { it.id == taskId }.toObservable() }
+        return store.map(ModelState::tasks)
+                .concatMap { tasks -> tasks.filter { it.id == taskId }.toObservable() }
+                .distinctUntilChanged()
     }
 
-    // TODO: Error handling. (Ignoring would count as 'handling'...)
+    // TODO: Better error handling. (Ignoring could count as 'handling' I guess, but meh...)
     // Example: An attributeMapper for description would be `Task::description`
     // The full call would be `model.taskAttribute(taskId, Task::description)`
     override fun <T> taskAttribute(taskId: String, attributeMapper: (Task) -> T): Observable<T> {
@@ -57,9 +65,6 @@ class BasicModel : Model {
                 .map(attributeMapper)
                 .distinctUntilChanged()
     }
-
-    // ***** SINKS *****
-    override fun accept(intent: Intent) = intents.accept(intent)
 
     /**
      * Reducer streams are allowed to emit on whatever thread they wish, but the
@@ -73,6 +78,9 @@ class BasicModel : Model {
             }
         }
     }
+
+    // ***** SINKS *****
+    override fun accept(intent: Intent) = intents.accept(intent)
 
 }
 

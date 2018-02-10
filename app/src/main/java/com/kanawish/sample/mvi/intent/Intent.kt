@@ -1,5 +1,6 @@
 package com.kanawish.sample.mvi.intent
 
+import com.kanawish.sample.mvi.model.Model
 import com.kanawish.sample.mvi.model.ModelState
 import com.kanawish.sample.mvi.model.Reducer
 import com.kanawish.sample.mvi.model.RestApi
@@ -15,6 +16,8 @@ import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.TaskClick
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Intents for the Tasks Model
@@ -29,6 +32,7 @@ import timber.log.Timber
 sealed class Intent
 
 abstract class ReducerIntent : Intent(), Reducer
+
 abstract class ObservableIntent : Intent(), () -> Observable<Reducer>
 
 object Refresh : ObservableIntent() {
@@ -56,42 +60,59 @@ object Refresh : ObservableIntent() {
     private val restService: RestApi = retrofitBuilder().create(RestApi::class.java)
 }
 
-data class CreateTask(val title: String, val description: String) : ReducerIntent() {
+class InlineIntent(private val inline: (ModelState) -> ModelState) : ReducerIntent() {
+    override fun invoke(oldState: ModelState): ModelState = inline(oldState)
+}
+
+class CreateTask(val title: String, val description: String) : ReducerIntent() {
     override fun invoke(oldState: ModelState): ModelState = TODO()
 }
 
-data class UpdateTask(val oldTask: Task, val taskReducer: (Task) -> Task) : ReducerIntent() {
-    override fun invoke(oldModel: ModelState): ModelState {
-        return oldModel.copy(
-                tasks = oldModel.tasks
-                        .toMutableList()
+class UpdateTask(private val oldTask: Task, private val taskReducer: (Task) -> Task) : ReducerIntent() {
+    override fun invoke(oldState: ModelState): ModelState {
+        return oldState.copy(
+                tasks = oldState.tasks.toMutableList()
                         .apply { set(indexOf(oldTask), taskReducer(oldTask)) }
                         .toList()
         )
     }
 }
 
-data class DeleteTask(val task: Task) : ReducerIntent() {
-    override fun invoke(oldModel: ModelState): ModelState = TODO()
+class ClearCompletedTasks() : ReducerIntent() {
+    override fun invoke(oldState: ModelState): ModelState {
+        return oldState.copy(
+                tasks = oldState.tasks.filter { !it.completed }
+        )
+    }
 }
 
-fun Observable<TasksViewEvent>.toIntent(): Observable<Intent> {
-    return this
-            .map { tasksViewEvent ->
-                when (tasksViewEvent) {
-                    RefreshTasksPulled -> Refresh as Intent
-                    is FilterTypeSelected -> TODO()
-                    is TaskCheckBoxClick -> UpdateTask(
-                            oldTask = tasksViewEvent.task,
-                            taskReducer = { task -> task.copy(completed = tasksViewEvent.checked) }
-                    )
-                    is TaskClick -> UpdateTask(
-                            oldTask = tasksViewEvent.task,
-                            taskReducer = { task -> task.copy(completed = !task.completed) }
-                    )
-                    ClearCompletedTasksClick -> TODO()
-                    TasksViewEvent.ClearCompletedTasksClick -> TODO()
-                }
-            }
-//            .ofType() // Filters out 'Unit'
+/**
+ * Useful to cut down on crufty `<TasksViewEvent>`.
+ */
+fun <T> Observable<T>.toViewEvent(mapper: (T) -> TasksViewEvent): Observable<TasksViewEvent> {
+    return map<TasksViewEvent>(mapper)
+}
+
+/**
+ * Maps TasksViewEvent to Intent
+ */
+fun map(event: TasksViewEvent): Intent {
+    return when (event) {
+        RefreshTasksPulled -> Refresh
+        is FilterTypeSelected -> InlineIntent { oldState -> oldState.copy(filter = event.type) }
+        is TaskCheckBoxClick -> UpdateTask(event.task) { task -> task.copy(completed = event.checked) }
+        is TaskClick -> UpdateTask(event.task) { task -> task.copy(completed = !task.completed) }
+        ClearCompletedTasksClick -> ClearCompletedTasks()
+    }
+}
+
+@Singleton
+class IntentMapper @Inject constructor(val model: Model) {
+    /**
+     * Accepts View Events, converts them, and passes the resulting Intents
+     * to the Model.
+     */
+    fun accept(event: TasksViewEvent) {
+        model.accept(map(event))
+    }
 }
