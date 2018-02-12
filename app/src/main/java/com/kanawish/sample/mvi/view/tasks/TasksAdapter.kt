@@ -27,9 +27,9 @@ class TasksAdapter @Inject constructor(
     init {
         setHasStableIds(true)
 
-        // NOTE: Not keeping disposable on hand would likely result in stream being garbage collected? (Validate)
-        // FIXME validating Unless the lambda below captures a ref to task adapter...?
-        // If this stayed alive, it means we'd leak eventually, right?
+        // NOTE: Not keeping disposable on hand results in stream being garbage collected.
+        // TODO (Double check this when time permits.)
+        // TODO (This rebinds vh every time a todo is checked. Add a "list changed" vs a "task in list changed" Observable)
         disposable = model.tasks()
                 .subscribe { newTasks ->
                     Timber.i("TaskAdapter received new tasks list of size ${newTasks.size}.")

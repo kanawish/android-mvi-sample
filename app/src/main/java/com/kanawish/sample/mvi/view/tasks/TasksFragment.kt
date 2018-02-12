@@ -72,8 +72,8 @@ class TasksFragment : Fragment() {
 
 
     override fun onResume() {
-        super.onResume()
         Timber.i("onResume()")
+        super.onResume()
 
         // MODEL(INTENT)
         // TasksViewEvent -> Intent
@@ -111,13 +111,15 @@ class TasksFragment : Fragment() {
     override fun onPause() {
         Timber.i("onPause()")
         super.onPause()
-        disposables.dispose()
+
+        disposables.clear()
     }
 
 
     // *** MENU HANDLING ***
     /**
-     * NOTE:  https://stackoverflow.com/questions/39146077/kotlin-android-extensions-and-menu
+     * NOTE: https://stackoverflow.com/questions/39146077/kotlin-android-extensions-and-menu
+     *
      * Long story short - it is not possible to use KAE with Android Menus.
      */
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

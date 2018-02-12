@@ -14,4 +14,5 @@ class AppModule(appContext: Application) : Module() {
         bind(Model::class.java).to(BasicModel::class.java)
         bind(ViewModel::class.java)
     }
+
 }

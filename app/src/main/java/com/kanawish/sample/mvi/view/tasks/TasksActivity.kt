@@ -47,8 +47,7 @@ class TasksActivity : AppCompatActivity() {
 
         addTaskFAB.setImageResource(R.drawable.ic_add)
 
-        // TODO: Find the problem with fragment lifecycle in this current sample...
-        var tasksFragment: TasksFragment = supportFragmentManager.findFragmentById(R.id.contentFrame) as? TasksFragment ?:
+        supportFragmentManager.findFragmentById(R.id.contentFrame) as? TasksFragment ?:
                 TasksFragment.newInstance().also {
                     ActivityUtils.addFragmentToActivity(
                             supportFragmentManager, it, R.id.contentFrame)
@@ -83,6 +82,7 @@ class TasksActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+
         disposables.clear()
     }
 
