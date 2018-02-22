@@ -29,6 +29,8 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 
+    implementation 'androidx.core:core-ktx:0.1'
+
     // Google Stack
     implementation "com.android.support:support-compat:27.0.2"
     implementation "com.android.support:support-fragment:27.0.2"

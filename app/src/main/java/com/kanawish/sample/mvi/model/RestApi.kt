@@ -1,5 +1,6 @@
 package com.kanawish.sample.mvi.model
 
+import io.reactivex.Observable
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Retrofit
@@ -22,7 +23,7 @@ fun retrofitBuilder(): Retrofit = Retrofit.Builder()
  */
 interface RestApi {
     @GET("demo.json")
-    fun tasksGet(): Single<List<Task>>
+    fun tasksGet(): Observable<List<Task>>
 
     @PUT("demo/{id}.json")
     fun taskPut(@Path("id") id: String, @Body task: Task): Single<ResponseBody>

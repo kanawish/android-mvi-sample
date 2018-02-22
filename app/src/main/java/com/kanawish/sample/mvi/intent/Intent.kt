@@ -5,6 +5,10 @@ import com.kanawish.sample.mvi.model.ModelState
 import com.kanawish.sample.mvi.model.Reducer
 import com.kanawish.sample.mvi.model.RestApi
 import com.kanawish.sample.mvi.model.SyncState
+import com.kanawish.sample.mvi.model.SyncState.ERROR
+import com.kanawish.sample.mvi.model.SyncState.IDLE
+import com.kanawish.sample.mvi.model.SyncState.PROCESS
+import com.kanawish.sample.mvi.model.SyncState.PROCESS.Type.REFRESH
 import com.kanawish.sample.mvi.model.Task
 import com.kanawish.sample.mvi.model.retrofitBuilder
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent
@@ -35,23 +39,53 @@ abstract class ReducerIntent : Intent(), Reducer
 
 abstract class ObservableIntent : Intent(), () -> Observable<Reducer>
 
+object RefreshAlt : ObservableIntent() {
+
+    // On start, "PROCESS(REFRESH)"
+    private fun refreshTasks(): Reducer = {
+        it.copy(syncState = PROCESS(REFRESH))
+    }
+
+    // On _success_, "IDLE" + loaded tasks list.
+    private fun success(tasks: List<Task>): Reducer = {
+        it.copy(syncState = IDLE, tasks = tasks)
+    }
+
+    // On _failed_, "ERROR(throwable)", followed by "IDLE".
+    private fun failed(error: Throwable): Observable<Reducer> = Observable.just(
+            { o -> o.copy(syncState = ERROR(error)) },
+            { o -> o.copy(syncState = IDLE) }
+    )
+
+    override fun invoke(): Observable<Reducer> {
+        return restService.tasksGet()
+                .subscribeOn(Schedulers.io())
+                .map(::success)
+                .onErrorResumeNext(::failed)
+                .startWith(refreshTasks())
+    }
+
+    private val restService: RestApi = retrofitBuilder().create(RestApi::class.java)
+
+}
+
 object Refresh : ObservableIntent() {
     override fun invoke(): Observable<Reducer> = Observable.create { e ->
         // Initial signal that the job started.
-        e.onNext({ o -> o.copy(syncState = SyncState.PROCESS(SyncState.PROCESS.Type.REFRESH)) })
+        e.onNext({ o -> o.copy(syncState = PROCESS(REFRESH)) })
         e.setDisposable(restService.tasksGet()
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         // On success, flip state back to "IDLE" and emit the tasks.
                         { tasks ->
-                            e.onNext { o -> o.copy(syncState = SyncState.IDLE, tasks = tasks) }
+                            e.onNext { o -> o.copy(syncState = IDLE, tasks = tasks) }
                             e.onComplete()
                         },
                         // On failure, emit "ERROR" with associated throwable.
                         { error ->
                             Timber.e(error)
-                            e.onNext { o -> o.copy(syncState = SyncState.ERROR(error)) }
-                            e.onNext { o -> o.copy(syncState = SyncState.IDLE) }
+                            e.onNext { o -> o.copy(syncState = ERROR(error)) }
+                            e.onNext { o -> o.copy(syncState = IDLE) }
                             e.onComplete()
                         })
         )
