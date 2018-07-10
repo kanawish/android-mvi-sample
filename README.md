@@ -16,14 +16,11 @@ Here are some articles/examples explaining the core principles of MVI and unidir
 - http://thenewstack.io/developers-need-know-mvi-player-view-intent/
 - http://blog.danlew.net/2017/07/27/an-introduction-to-functional-reactive-programming/
 
-This project, while based off of Google's architectural samples repo, is my 
-personal take on the MVI pattern. Motivation was to be able to first build a working 
-sample, and only worry about getting formal approval if it gains some traction in the 
-community. (Google architecture samples need to have their dependencies vetted, have 
-some decent traction from dev community at large, use the `m` attribute prefix, etc.)
+This project is now organized in stages, to allow folks to follow along.
 
-Hoping to contribute back any useful patterns found here to the Architecture repo once
-these conditions are met.
+- TODO [Stage 01]() Skeleton project
+- TODO [Stage 02]() 
+- TODO [Stage 03]()
 
 ## Stack
 
@@ -32,8 +29,6 @@ these conditions are met.
   - RxBindings
   - RxRelay (TBD?)
 - Toothpick DI
-- Room
-- [ ] TODO: Document other uses.
 
 ## Application Components
 
