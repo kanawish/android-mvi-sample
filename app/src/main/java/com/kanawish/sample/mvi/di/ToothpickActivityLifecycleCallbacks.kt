@@ -12,7 +12,7 @@ import toothpick.smoothie.module.SmoothieActivityModule
 /**
  * Auto-injects Activities at the right time in their lifecycle.
  *
- * Also sets up auto-injection lifecycle callbacks for child fragments when appropriate.
+ * Also, sets up auto-injection for child fragments.
  */
 class ToothpickActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
 
@@ -28,6 +28,12 @@ class ToothpickActivityLifecycleCallbacks : Application.ActivityLifecycleCallbac
         }
     }
 
+    private fun openActivityScope(activity: Activity): Scope {
+        return Toothpick.openScopes(activity.application, activity).apply {
+            installModules(SmoothieActivityModule(activity))
+        }
+    }
+
     override fun onActivityDestroyed(activity: Activity?) {
         if (activity is FragmentActivity) {
             activity.supportFragmentManager.unregisterFragmentLifecycleCallbacks(fragmentCallbacks)
@@ -35,15 +41,6 @@ class ToothpickActivityLifecycleCallbacks : Application.ActivityLifecycleCallbac
 
         activity?.apply {
             Toothpick.closeScope(this)
-        }
-    }
-
-    private fun openActivityScope(activity: Activity): Scope {
-        return Toothpick.openScopes(activity.application, activity).apply {
-            installModules(
-                    SmoothieActivityModule(activity),
-                    ActivityModule
-            )
         }
     }
 
