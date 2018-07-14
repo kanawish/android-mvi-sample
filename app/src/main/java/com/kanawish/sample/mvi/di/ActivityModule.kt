@@ -4,6 +4,6 @@ import toothpick.config.Module
 
 object ActivityModule : Module() {
     init {
-        // NOTE: Add bindings here as needed.
+        // TODO: Define activity-scope bindings here.
     }
 }

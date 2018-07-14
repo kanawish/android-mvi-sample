@@ -4,6 +4,6 @@ import toothpick.config.Module
 
 object AppModule : Module() {
     init {
-        // TODO: Add bindings here as needed.
+        // TODO: Define application-scope bindings here.
     }
 }
