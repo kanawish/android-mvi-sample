@@ -13,7 +13,7 @@ import toothpick.Toothpick
  */
 class ToothpickFragmentLifecycleCallbacks() : FragmentLifecycleCallbacks() {
     override fun onFragmentPreAttached(fm: FragmentManager?, f: Fragment?, context: Context?) {
-        f?.let { fragment -> Toothpick.inject(fragment, Toothpick.openScopes(fragment.activity?:context, fragment)) }
+        f?.let { fragment -> Toothpick.inject(fragment, Toothpick.openScopes(context, fragment)) }
     }
 
     override fun onFragmentDetached(fm: FragmentManager?, f: Fragment?) {
