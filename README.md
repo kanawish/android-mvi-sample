@@ -1,15 +1,15 @@
 
-## Lesson 02
+## Lesson 03
 
-### Setting up an Android MVI project
+### Defining Model and Model State
 
-We've covered the basic theory behind MVI. We now want to apply it in practice. In this lesson, let's set up our Android MVI project. We'll sketch the overall structure of our app. Then we'll go over what libraries we will be using, and why.
+We'll be building a TODO app. So we're looking at a connected list-detail type app, with basic create, update and delete functionality. In this lesson, we'll build our Model State data classes, and the Model interface.
 
 ### Index
 
 - [Lesson 01 - What is MVI?](https://watch.caster.io/courses/...)
-- **Lesson 02: Setting up an Android MVI project**
-- [Lesson 03 - Defining Model and Model State](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson03)
+- [Lesson 02 - Setting up an Android MVI project](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson02-setup)
+- **Lesson 03 - Defining Model and Model State**
 - [Lesson 04 - Models, Stores and Reducers](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson04)
 - [Lesson 05 - Testing Model Stores](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson05)
 - [Lesson 06 - View Interface](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson06)
