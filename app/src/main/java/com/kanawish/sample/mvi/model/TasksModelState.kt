@@ -44,7 +44,7 @@ sealed class SyncState {
 /**
  * ModelState holds all the states we track in the Model.
  */
-data class ModelState(
+data class TasksModelState(
         val tasks: List<Task>,
         val filter: FilterType,
         val syncState: SyncState

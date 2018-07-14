@@ -1,16 +1,16 @@
 
-## Lesson 03
+## Lesson 04
 
-### Defining Model and Model State
+### Models, Stores and Reducers
 
-We'll be building a TODO app. So we're looking at a connected list-detail type app, with basic create, update and delete functionality. In this lesson, we'll build our Model State data classes, and the Model interface.
+We defined a model interface, we now need to implement it. We'll cover the basic concepts Model stores. A model store is a thread-safe way to managing state in an MVI application. The concept is borrowed from state container libraries like Flux and Redux. We will see how to use RxJava to build our own ModelState Store.
 
 ### Index
 
 - [Lesson 01 - What is MVI?](https://watch.caster.io/courses/...)
 - [Lesson 02 - Setting up an Android MVI project](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson02-setup)
-- **Lesson 03 - Defining Model and Model State**
-- [Lesson 04 - Models, Stores and Reducers](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson04)
+- [Lesson 03 - Defining Model and Model State](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson03)
+- **Lesson 04 - Models, Stores and Reducers**
 - [Lesson 05 - Testing Model Stores](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson05)
 - [Lesson 06 - View Interface](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson06)
 - [Lesson 07 - Rendering changes to the Model](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson07)
