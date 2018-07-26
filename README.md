@@ -1,18 +1,18 @@
 
-## Lesson 04
+## Lesson 05
+ 
+### Testing Model Stores
 
-### Models, Stores and Reducers
-
-We defined a model interface, we now need to implement it. We'll cover the basic concepts Model stores. A model store is a thread-safe way to managing state in an MVI application. The concept is borrowed from state container libraries like Flux and Redux. We will see how to use RxJava to build our own ModelState Store.
+We've created our ModelStore. Before moving forward, it's essential to validate the Store is working correctly. Let's learn the basics of Unit testing with Toothpick DI and RxJava 2.
 
 ### Index
 
 - [Lesson 01 - What is MVI?](https://watch.caster.io/courses/...)
 - [Lesson 02 - Setting up an Android MVI project](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson02-setup)
 - [Lesson 03 - Defining Model and Model State](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson03)
-- **Lesson 04 - Models, Stores and Reducers**
-- [Lesson 05 - Testing Model Stores](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson05)
-- [Lesson 06 - View Interface](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson06)
+- [Lesson 04 - Models, Stores and Reducers](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson04)
+- **Lesson 05 - Testing Model Stores**
+- [Lesson 06 View Interface](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson06)
 - [Lesson 07 - Rendering changes to the Model](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson07)
 - [Lesson 08 - From View Events to Intents](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson08)
 - [Lesson 09 - Processing simple Intents](https://github.com/kanawish/android-mvi-sample/tree/caster/lesson09)
