@@ -1,6 +1,6 @@
 package com.kanawish.sample.mvi.model
 
-import com.kanawish.sample.mvi.intent.singleIntent
+import com.kanawish.sample.mvi.intent.reducer
 import com.kanawish.sample.mvi.model.FilterType.ACTIVE
 import com.kanawish.sample.mvi.model.FilterType.COMPLETE
 import com.kanawish.sample.mvi.model.SyncState.IDLE
@@ -55,7 +55,7 @@ class TasksModelStoreTest {
         val testObserver = TestObserver<TasksModelState>()
 
         // Process a mock intent
-        tasksModelStore.process( singleIntent { s ->
+        tasksModelStore.process( reducer { s ->
             s.copy(filter = COMPLETE, syncState = PROCESS(REFRESH))
         })
 
@@ -68,7 +68,7 @@ class TasksModelStoreTest {
             assert(it.syncState == PROCESS(REFRESH))
         }
 
-        tasksModelStore.process( singleIntent { s ->
+        tasksModelStore.process( reducer { s ->
             s.copy(tasks = listOf(Task(lastUpdate = -1)), filter = ACTIVE, syncState = IDLE)
         })
         testObserver.assertValueCount(2)

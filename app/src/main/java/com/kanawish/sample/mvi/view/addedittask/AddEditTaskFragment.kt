@@ -9,18 +9,28 @@ import android.view.View
 import android.view.ViewGroup
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.kanawish.sample.mvi.R
+import com.kanawish.sample.mvi.intent.toIntent
+import com.kanawish.sample.mvi.model.TaskEditorState
+import com.kanawish.sample.mvi.model.TaskEditorStore
 import com.kanawish.sample.mvi.view.ViewContract
 import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.DescriptionChange
 import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.TitleChange
 import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.addtask_act.fab_edit_task_done
 import kotlinx.android.synthetic.main.addtask_frag.add_task_description
 import kotlinx.android.synthetic.main.addtask_frag.add_task_title
+import javax.inject.Inject
 
 /**
  * Fragment for adding/editing tasks.
  */
-class AddEditTaskFragment : Fragment(), ViewContract<AddEditTaskViewEvent, Unit> {
+class AddEditTaskFragment : Fragment(), ViewContract<AddEditTaskViewEvent, TaskEditorState> {
+
+    @Inject lateinit var editorStore: TaskEditorStore
+
+    private val disposables = CompositeDisposable()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -36,6 +46,16 @@ class AddEditTaskFragment : Fragment(), ViewContract<AddEditTaskViewEvent, Unit>
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
         inflater.inflate(R.menu.addtask_fragment_menu, menu)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        disposables += events().toIntent().subscribe(editorStore::process)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        disposables.clear()
     }
 
     override fun events(): Observable<AddEditTaskViewEvent> {
