@@ -6,11 +6,11 @@ import java.util.*
  * Task Model
  */
 data class Task(
-        val id: String = UUID.randomUUID().toString(),
-        val lastUpdate: Long = -1,
-        val title: String = "New Task",
-        val description: String = "",
-        val completed: Boolean = false
+    val id: String = UUID.randomUUID().toString(),
+    val lastUpdate: Long = -1,
+    val title: String = "New Task",
+    val description: String = "",
+    val completed: Boolean = false
 )
 
 /**
@@ -45,9 +45,9 @@ sealed class SyncState {
  * ModelState holds all the states we track in the Model.
  */
 data class TasksModelState(
-        val tasks: List<Task>,
-        val filter: FilterType,
-        val syncState: SyncState
+    val tasks: List<Task>,
+    val filter: FilterType,
+    val syncState: SyncState
 )
 
 /*
@@ -55,13 +55,45 @@ data class TasksModelState(
 
     @startuml
     [*] --> IDLE
-    IDLE --> PROCESS : refresh tasks
-    IDLE --> PROCESS : create task
-    IDLE --> PROCESS : update task
+    IDLE --> PROCESS : refresh
+    IDLE --> PROCESS : check task
 
-    PROCESS --> [*] : success
+    PROCESS -left-> IDLE : success
     PROCESS --> ERROR : failed
-    ERROR-->[*]
+    ERROR-->IDLE
     @enduml
+    
+    Class Diagram for Tasks 
+    
+   @startuml
+   hide empty members
+   class TasksModelState << (D,orchid) data class >>{
+       tasks: List<Task>
+       filter: FilterType
+       syncState: SyncState
+   }
+   class Task {
+   id: String
+   lastUpdate: Long
+   title: String
+   description: String
+   completed: Boolean
+   }
+   enum SyncState << (S,#FF7700) sealed class >> {
+   Idle()
+   Process(type)
+   Error(details)
+   }
+   enum FilterType {
+   ANY()
+   ACTIVE()
+   COMPLETE()
+   }
+
+   TasksModelState*--Task:tasks
+   TasksModelState*--SyncState:syncState
+   TasksModelState*--FilterType:filter
+   @enduml
+    
  */
 

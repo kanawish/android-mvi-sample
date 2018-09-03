@@ -20,7 +20,7 @@ import javax.inject.Inject
  * CONCEPT: When an intent ends up depending on other stores or services,
  * use this "IntentBuilder" pattern.
  *
- * NOTE: Consider move to a pure 'Consume<AddEditTaskViewEvent>' mode vs 'toIntents()'
+ * TODO: Consider move to a pure 'Consume<AddEditTaskViewEvent>' mode vs 'toIntents()'
  */
 class EditorIntentBuilder @Inject constructor(
     private val tasksModelStore: TasksModelStore
