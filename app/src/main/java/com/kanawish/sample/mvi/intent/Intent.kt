@@ -38,3 +38,18 @@ fun <S> intervalBlocksIntent(period: Long, vararg blocks: S.() -> S): Intent<S> 
         }
     }
 }
+
+/**
+ * checkedIntent function creates a single-reducer intent. We use this to guard against
+ * incoherent incoming ViewEvents.
+ */
+inline fun <reified S : T, reified T> checkedIntent(crossinline block: S.() -> T?, crossinline fallback: () -> T): Intent<T> {
+    return object : Intent<T> {
+        override fun reducers(): Observable<Reducer<T>> {
+            return Observable.just { old ->
+                (old as? S)?.block()
+                        ?: fallback()
+            }
+        }
+    }
+}
