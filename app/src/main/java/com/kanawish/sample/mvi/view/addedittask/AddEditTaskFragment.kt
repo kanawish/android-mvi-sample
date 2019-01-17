@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.kanawish.sample.mvi.R
+import com.kanawish.sample.mvi.intent.EditorIntentBuilder
 import com.kanawish.sample.mvi.intent.toIntent
 import com.kanawish.sample.mvi.model.TaskEditorState
 import com.kanawish.sample.mvi.model.TaskEditorStore
@@ -17,6 +18,7 @@ import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.Description
 import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.TitleChange
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.addtask_act.fab_edit_task_done
 import kotlinx.android.synthetic.main.addtask_frag.add_task_description
@@ -29,6 +31,7 @@ import javax.inject.Inject
 class AddEditTaskFragment : Fragment(), ViewContract<AddEditTaskViewEvent, TaskEditorState> {
 
     @Inject lateinit var editorStore: TaskEditorStore
+    @Inject lateinit var intentBuilder: EditorIntentBuilder
 
     private val disposables = CompositeDisposable()
 
@@ -50,7 +53,7 @@ class AddEditTaskFragment : Fragment(), ViewContract<AddEditTaskViewEvent, TaskE
 
     override fun onResume() {
         super.onResume()
-        disposables += events().toIntent().subscribe(editorStore::process)
+        disposables += events().toIntent(intentBuilder).subscribe(editorStore::process)
     }
 
     override fun onPause() {

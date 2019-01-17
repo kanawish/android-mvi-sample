@@ -1,25 +1,14 @@
 package com.kanawish.sample.mvi.model
 
-import com.kanawish.sample.mvi.intent.Intent
-import com.kanawish.sample.mvi.intent.singleBlockIntent
+import android.annotation.SuppressLint
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
+@SuppressLint("CheckResult")
 @Singleton
 class TaskEditorStore @Inject constructor() :
-        ModelStore<TaskEditorState>(
-                TaskEditorState(
-                        Task("bogusId", System.currentTimeMillis()),
-                        EditState.EDITING)
-        )
-
-data class TaskEditorState(val task: Task?, val editState: EditState) {
-    companion object {
-        fun taskBlock(block: Task.() -> Task): Intent<TaskEditorState> {
-            return singleBlockIntent { copy(task = task?.block()) }
-        }
-    }
-}
+    ModelStore<TaskEditorState>(TaskEditorState.Editing(Task()))
 
 /**
  * State transitions only concern state. They're not responsible for asynchronous jobs or
@@ -28,12 +17,12 @@ data class TaskEditorState(val task: Task?, val editState: EditState) {
 sealed class TaskEditorState {
 
     object Closed : TaskEditorState() {
-        fun newTask() = Creating
-        fun editTask(task: Task) = Editing(task)
+        fun createTask() = Creating
+        fun openTask(task: Task) = Editing(task)
     }
 
     object Creating : TaskEditorState() {
-        fun editTask(task: Task) = Editing(task)
+        fun created(task: Task) = Editing(task)
     }
 
     data class Editing(val task: Task) : TaskEditorState() {
@@ -44,34 +33,79 @@ sealed class TaskEditorState {
     }
 
     data class Saving(val task: Task) : TaskEditorState() {
-        fun done() = Closed
+        fun saved() = Closed
     }
 
     data class Deleting(val taskId: String) : TaskEditorState() {
-        fun done() = Closed
+        fun deleted() = Closed
     }
 }
 
 /*
-    Edit State Machine
+    Full State Machine
 
     @startuml
     [*] --> CLOSED
-    CLOSED --> EDITING : editTask
+    CLOSED : error:String?
+    CLOSED --> EDITING : openTask
     CLOSED --> CREATING : createTask
-    CREATING --> EDITING : editTask
 
-    EDITING : task
+    CREATING -down-> EDITING : created
+    CREATING --> CLOSED : error
+
+    EDITING : task:Task
+    EDITING : error:String?
     EDITING --> EDITING : edit
-    EDITING --> SAVING : save
-    EDITING --> DELETING : delete
-    EDITING -up-> CLOSED : cancel
+    EDITING -down-> SAVING : save
+    EDITING -down-> DELETING : delete
+    EDITING -left-> CLOSED : cancel
 
-    DELETING -> CLOSED : done
+    DELETING -up-> CLOSED : deleted
+    DELETING --> EDITING : error
     DELETING : taskId
 
-    SAVING --> CLOSED : done
+    SAVING -up-> CLOSED : saved
+    SAVING --> EDITING : error
     SAVING : task
+    @enduml
+ */
 
+/*
+   Simplified State Machine [no errors]
+
+    @startuml
+    [*] --> CLOSED
+    CLOSED --> EDITING : openTask
+    CLOSED --> CREATING : createTask
+
+    CREATING -down-> EDITING : created
+
+    EDITING : task:Task
+    EDITING --> EDITING : edit
+    EDITING -down-> SAVING : save
+    EDITING -down-> DELETING : delete
+    EDITING --> CLOSED : cancel
+
+    DELETING --> CLOSED : deleted
+    DELETING : taskId
+
+    SAVING -up-> CLOSED : saved
+    SAVING : task
+    @enduml
+ */
+
+/*
+   Naive State Machine [no async]
+
+    @startuml
+    [*] --> CLOSED
+    CLOSED --> EDITING : openTask
+    CLOSED --> EDITING : createTask
+
+    EDITING : task:Task
+    EDITING --> EDITING : edit
+    EDITING -down-> CLOSED : save
+    EDITING -down-> CLOSED : delete
+    EDITING -up-> CLOSED : cancel
     @enduml
  */

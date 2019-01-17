@@ -1,8 +1,6 @@
 package com.kanawish.sample.mvi.intent
 
 import io.reactivex.Observable
-import io.reactivex.functions.BiFunction
-import java.util.concurrent.TimeUnit
 
 interface Intent<S> {
     fun reducers(): Observable<Reducer<S>>
@@ -10,46 +8,17 @@ interface Intent<S> {
 
 typealias Reducer<S> = (S) -> S
 
-fun <S> singleReducerIntent(reducer: (S) -> S): Intent<S> {
-    return object : Intent<S> {
-        override fun reducers(): Observable<Reducer<S>> {
-            return Observable.just(reducer)
-        }
-    }
-}
-
-fun <S> singleBlockIntent(block: S.() -> S): Intent<S> {
-    return object : Intent<S> {
-        override fun reducers(): Observable<Reducer<S>> {
-            return Observable.just { old -> old.block() }
-        }
-    }
-}
-
-fun <S> intervalBlocksIntent(period: Long, vararg blocks: S.() -> S): Intent<S> {
-    return object : Intent<S> {
-        override fun reducers(): Observable<Reducer<S>> {
-            return Observable.fromArray(*blocks)
-                    .map { block -> { old: S -> old.block() } }
-                    .zipWith(
-                            Observable.interval(period, TimeUnit.SECONDS),
-                            BiFunction { b, _ -> b }
-                    )
-        }
-    }
+// NOTE: Magic of extension functions, (T)->T and T.()->T interchangeable.
+fun <T> intent(block: T.() -> T): Intent<T> = object : Intent<T> {
+    override fun reducers(): Observable<Reducer<T>> = Observable.just(block)
 }
 
 /**
- * checkedIntent function creates a single-reducer intent. We use this to guard against
+ * checkedIntent function creating a single-reducer intent. We use this to guard against
  * incoherent incoming ViewEvents.
  */
-inline fun <reified S : T, reified T> checkedIntent(crossinline block: S.() -> T?, crossinline fallback: () -> T): Intent<T> {
-    return object : Intent<T> {
-        override fun reducers(): Observable<Reducer<T>> {
-            return Observable.just { old ->
-                (old as? S)?.block()
-                        ?: fallback()
-            }
-        }
+inline fun <reified S : T, reified T> checkedIntent(crossinline block: S.() -> T): Intent<T> =
+    intent {
+        (this as? S)?.block()
+            ?: throw IllegalStateException("checkedReducer encountered an inconsistent State.")
     }
-}
