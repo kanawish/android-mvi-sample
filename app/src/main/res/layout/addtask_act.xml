@@ -51,6 +51,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
+            <LinearLayout
+                android:id="@+id/busy"
+                android:visibility="gone"
+                android:background="#CFFF"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ProgressBar
+                    android:layout_gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab_edit_task_done"
                 android:layout_width="wrap_content"
