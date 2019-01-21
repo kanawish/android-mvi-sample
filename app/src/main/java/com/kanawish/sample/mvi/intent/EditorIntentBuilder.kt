@@ -4,15 +4,14 @@ import com.kanawish.sample.mvi.model.Task
 import com.kanawish.sample.mvi.model.TaskEditorState
 import com.kanawish.sample.mvi.model.TaskEditorState.Closed
 import com.kanawish.sample.mvi.model.TaskEditorState.Editing
-import com.kanawish.sample.mvi.model.TasksModelState
 import com.kanawish.sample.mvi.model.TasksModelStore
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.DeleteTaskClick
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.DescriptionChange
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.EditTaskClick
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.NewTaskClick
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.SaveTaskClick
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.TitleChange
+import com.kanawish.sample.mvi.view.edittask.EditTaskViewEvent
+import com.kanawish.sample.mvi.view.edittask.EditTaskViewEvent.DeleteTaskClick
+import com.kanawish.sample.mvi.view.edittask.EditTaskViewEvent.DescriptionChange
+import com.kanawish.sample.mvi.view.edittask.EditTaskViewEvent.EditTaskClick
+import com.kanawish.sample.mvi.view.edittask.EditTaskViewEvent.NewTaskClick
+import com.kanawish.sample.mvi.view.edittask.EditTaskViewEvent.SaveTaskClick
+import com.kanawish.sample.mvi.view.edittask.EditTaskViewEvent.TitleChange
 import io.reactivex.Observable
 import javax.inject.Inject
 
@@ -57,7 +56,7 @@ class EditorIntentBuilder @Inject constructor(
     private inline fun <reified S : TaskEditorState> editorIntent(crossinline init: S.() -> TaskEditorState) =
         checkedIntent(init)
 
-    fun Observable<AddEditTaskViewEvent>.toIntent(): Observable<Intent<TaskEditorState>> {
+    fun Observable<EditTaskViewEvent>.toIntent(): Observable<Intent<TaskEditorState>> {
         return map { event ->
             when (event) {
                 NewTaskClick -> newTaskIntent()
@@ -78,5 +77,4 @@ class EditorIntentBuilder @Inject constructor(
 
 }
 
-fun Observable<AddEditTaskViewEvent>.toIntent(builder:EditorIntentBuilder) = builder.run { toIntent() }
-
+fun Observable<EditTaskViewEvent>.toIntent(builder:EditorIntentBuilder) = builder.run { toIntent() }

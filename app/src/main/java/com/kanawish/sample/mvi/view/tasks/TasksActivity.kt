@@ -15,8 +15,8 @@ import com.kanawish.sample.mvi.model.TaskEditorStore
 import com.kanawish.sample.mvi.util.replaceFragmentInActivity
 import com.kanawish.sample.mvi.util.setupActionBar
 import com.kanawish.sample.mvi.view.ViewContract
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskActivity
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent
+import com.kanawish.sample.mvi.view.edittask.EditTaskActivity
+import com.kanawish.sample.mvi.view.edittask.EditTaskViewEvent
 import com.kanawish.sample.mvi.view.statistics.StatisticsActivity
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -36,17 +36,17 @@ class TasksActivity : AppCompatActivity() {
     @Inject lateinit var editorStore: TaskEditorStore
     @Inject lateinit var builder: EditorIntentBuilder
 
-    private val editorContract = object : ViewContract<AddEditTaskViewEvent, TaskEditorState> {
+    private val editorContract = object : ViewContract<EditTaskViewEvent, TaskEditorState> {
         override fun Observable<TaskEditorState>.subscribeView(): Disposable {
             return ofType<TaskEditorState.Editing>()
                     .subscribe {
-                        val intent = Intent(this@TasksActivity, AddEditTaskActivity::class.java)
+                        val intent = Intent(this@TasksActivity, EditTaskActivity::class.java)
                         startActivity(intent)
                     }
         }
 
-        override fun events(): Observable<AddEditTaskViewEvent> {
-            return newTaskFAB.clicks().map { AddEditTaskViewEvent.NewTaskClick }
+        override fun events(): Observable<EditTaskViewEvent> {
+            return newTaskFAB.clicks().map { EditTaskViewEvent.NewTaskClick }
         }
     }
 

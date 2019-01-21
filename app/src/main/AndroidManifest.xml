@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.addedittask.AddEditTaskActivity"
+            android:name=".view.edittask.EditTaskActivity"
             android:exported="true" />
         <activity
             android:name=".view.statistics.StatisticsActivity"

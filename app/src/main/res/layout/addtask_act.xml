@@ -20,7 +20,7 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.addedittask.AddEditTaskActivity">
+    tools:context=".view.edittask.EditTaskActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

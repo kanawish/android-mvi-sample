@@ -1,4 +1,4 @@
-package com.kanawish.sample.mvi.view.addedittask
+package com.kanawish.sample.mvi.view.edittask
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -15,8 +15,8 @@ import com.kanawish.sample.mvi.intent.toIntent
 import com.kanawish.sample.mvi.model.TaskEditorState
 import com.kanawish.sample.mvi.model.TaskEditorStore
 import com.kanawish.sample.mvi.view.ViewContract
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.DescriptionChange
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.TitleChange
+import com.kanawish.sample.mvi.view.edittask.EditTaskViewEvent.DescriptionChange
+import com.kanawish.sample.mvi.view.edittask.EditTaskViewEvent.TitleChange
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -29,7 +29,9 @@ import javax.inject.Inject
 /**
  * Fragment for adding/editing tasks.
  */
-class AddEditTaskFragment : Fragment(), ViewContract<AddEditTaskViewEvent, TaskEditorState> {
+class EditTaskFragment :
+    Fragment(),
+    ViewContract<EditTaskViewEvent, TaskEditorState> {
 
     @Inject lateinit var editorStore: TaskEditorStore
     @Inject lateinit var intentBuilder: EditorIntentBuilder
@@ -56,7 +58,7 @@ class AddEditTaskFragment : Fragment(), ViewContract<AddEditTaskViewEvent, TaskE
         disposables.clear()
     }
 
-    override fun events(): Observable<AddEditTaskViewEvent> {
+    override fun events(): Observable<EditTaskViewEvent> {
         return Observable.merge(
                 add_task_title.textChanges().map { TitleChange(it.toString()) },
                 add_task_description.textChanges().map { DescriptionChange(it.toString()) }

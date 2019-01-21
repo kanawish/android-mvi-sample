@@ -1,4 +1,4 @@
-package com.kanawish.sample.mvi.view.addedittask
+package com.kanawish.sample.mvi.view.edittask
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -15,8 +15,8 @@ import com.kanawish.sample.mvi.model.TaskEditorStore
 import com.kanawish.sample.mvi.util.replaceFragmentInActivity
 import com.kanawish.sample.mvi.util.setupActionBar
 import com.kanawish.sample.mvi.view.ViewContract
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.DeleteTaskClick
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.SaveTaskClick
+import com.kanawish.sample.mvi.view.edittask.EditTaskViewEvent.DeleteTaskClick
+import com.kanawish.sample.mvi.view.edittask.EditTaskViewEvent.SaveTaskClick
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -30,7 +30,7 @@ import javax.inject.Inject
 /**
  * Activity houses the Toolbar, a FAB and the fragment for adding/editing tasks.
  */
-class AddEditTaskActivity : AppCompatActivity(), ViewContract<AddEditTaskViewEvent, TaskEditorState> {
+class EditTaskActivity : AppCompatActivity(), ViewContract<EditTaskViewEvent, TaskEditorState> {
 
     @Inject lateinit var editorStore: TaskEditorStore
     @Inject lateinit var intentBuilder: EditorIntentBuilder
@@ -51,8 +51,8 @@ class AddEditTaskActivity : AppCompatActivity(), ViewContract<AddEditTaskViewEve
             setDisplayShowHomeEnabled(true)
         }
 
-        supportFragmentManager.findFragmentById(R.id.contentFrame) as AddEditTaskFragment?
-                ?: AddEditTaskFragment().also {
+        supportFragmentManager.findFragmentById(R.id.contentFrame) as EditTaskFragment?
+                ?: EditTaskFragment().also {
                     replaceFragmentInActivity(it, R.id.contentFrame)
                 }
     }
@@ -107,7 +107,7 @@ class AddEditTaskActivity : AppCompatActivity(), ViewContract<AddEditTaskViewEve
         }
     }
 
-    override fun events(): Observable<AddEditTaskViewEvent> {
+    override fun events(): Observable<EditTaskViewEvent> {
         return Observable.merge(
                 toolbar.itemClicks()
                         .filter { it.itemId == R.id.menu_delete }

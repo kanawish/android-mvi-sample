@@ -21,7 +21,7 @@ import com.kanawish.sample.mvi.model.TaskEditorStore
 import com.kanawish.sample.mvi.model.TasksModelState
 import com.kanawish.sample.mvi.model.TasksModelStore
 import com.kanawish.sample.mvi.view.ViewContract
-import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent
+import com.kanawish.sample.mvi.view.edittask.EditTaskViewEvent
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -168,9 +168,9 @@ class TasksFragment : Fragment() {
             }
         }
 
-        fun titleClicks(): Observable<AddEditTaskViewEvent> {
+        fun titleClicks(): Observable<EditTaskViewEvent> {
             return itemView.title.clicks().map {
-                AddEditTaskViewEvent.EditTaskClick(currentTask)
+                EditTaskViewEvent.EditTaskClick(currentTask)
             }
         }
 
