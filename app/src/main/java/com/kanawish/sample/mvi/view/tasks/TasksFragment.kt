@@ -8,11 +8,15 @@ import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import com.kanawish.sample.mvi.R
+import com.kanawish.sample.mvi.model.TasksModelStore
+import javax.inject.Inject
 
 /**
  * This fragment hold the UI for the list of tasks you can check off.
  */
 class TasksFragment : Fragment() {
+
+    @Inject lateinit var tasksModelStore: TasksModelStore
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
