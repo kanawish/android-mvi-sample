@@ -25,48 +25,50 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:focusable="false">
 
         <LinearLayout
-            android:id="@+id/tasksLL"
+            android:id="@+id/tasksLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/filteringLabelTV"
+                android:id="@+id/filteringLabelTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:layout_marginLeft="@dimen/list_item_padding"
-                android:layout_marginRight="@dimen/list_item_padding"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:gravity="center_vertical"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/tasksRV"
+                android:id="@+id/tasksRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/noTasksLL"
+            android:id="@+id/noTasksLinearLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/noTasksIconIV"
+                android:id="@+id/noTasksIconImageView"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_assignment_turned_in_24dp" />
 
             <TextView
-                android:id="@+id/noTasksMainTV"
+                android:id="@+id/noTasksMainTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -74,5 +76,7 @@
                 android:text="@string/no_tasks_all" />
 
         </LinearLayout>
+
     </RelativeLayout>
+
 </android.support.v4.widget.SwipeRefreshLayout>

@@ -4,62 +4,64 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.kanawish.sample.mvi.R
-import com.kanawish.sample.mvi.intent.IntentMapper
-import com.kanawish.sample.mvi.model.Model
+import com.kanawish.sample.mvi.intent.TasksIntentFactory
 import com.kanawish.sample.mvi.model.Task
+import com.kanawish.sample.mvi.model.TasksModelStore
+import com.kanawish.sample.mvi.model.TasksState
+import com.kanawish.sample.mvi.view.StateSubscriber
+import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import timber.log.Timber
-import java.util.*
+import io.reactivex.rxkotlin.plusAssign
 import javax.inject.Inject
 
 class TasksAdapter @Inject constructor(
-        private val inflater: LayoutInflater,
-        private val intentMapper: IntentMapper,
-        val model: Model
-) : RecyclerView.Adapter<TasksViewHolder>() {
+    private val layoutInflater: LayoutInflater,
+    private val tasksModelStore: TasksModelStore,
+    private val tasksIntent: TasksIntentFactory
+) : RecyclerView.Adapter<TaskViewHolder>(),
+    StateSubscriber<TasksState> {
 
-    var tasks: List<Task> = emptyList()
+    private lateinit var filteredTasks: List<Task>
 
-    // TODO: Validate this assumption is correct.
-    // We rely on garbage collection of Adapter here.
-    private val disposable: Disposable
+    private val disposables = CompositeDisposable()
 
     init {
         setHasStableIds(true)
-
-        // NOTE: Not keeping disposable on hand results in stream being garbage collected.
-        // TODO (Double check this when time permits.)
-        // TODO (This rebinds vh every time a todo is checked. Add a "list changed" vs a "task in list changed" Observable)
-        disposable = model.tasks()
-                .subscribe { newTasks ->
-                    Timber.i("TaskAdapter received new tasks list of size ${newTasks.size}.")
-                    tasks = newTasks
-
-                    // Simplistic approach, forces a rebind for all visible viewHolders.
-                    notifyDataSetChanged()
-                }
     }
 
-    override fun getItemCount(): Int {
-        return tasks.size
+    override fun Observable<TasksState>.subscribeToState(): Disposable {
+        return map(TasksState::filteredTasks)
+            .distinctUntilChanged()
+            .subscribe { updatedTasks ->
+                filteredTasks = updatedTasks
+                notifyDataSetChanged()
+            }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): TasksViewHolder {
-        return TasksViewHolder(inflater.inflate(R.layout.task_item, parent, false), intentMapper::accept)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
+        val inflatedView = layoutInflater.inflate(R.layout.task_item, parent, false)
+        // NOTE: Another good 'special case' where the events are coming from ViewHolder, and...
+        return TaskViewHolder(inflatedView).apply {
+            events().subscribe(tasksIntent::process)
+        }
     }
 
-    override fun onBindViewHolder(holder: TasksViewHolder, position: Int) {
-        holder.bind(tasks[position])
+    override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
+        holder.bind(filteredTasks[position])
     }
 
-    override fun onViewRecycled(holder: TasksViewHolder) {
-        holder.unbind()
+    override fun getItemCount(): Int = filteredTasks.size
+
+    // NOTE: ... the state changes are the concern of this parent TaskAdapter
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        disposables += tasksModelStore.modelState().subscribeToState()
     }
 
-    override fun getItemId(i: Int): Long {
-        return tasks[i].id.toLong()
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        disposables.clear()
     }
 
-    // Following can be useful if your ids are UUIDs.
-    private fun uuidStringToLong(uuidString: String): Long = UUID.fromString(uuidString).mostSignificantBits and Long.MAX_VALUE
 }
