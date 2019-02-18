@@ -1,7 +1,9 @@
 package com.kanawish.sample.mvi.intent
 
+import com.kanawish.sample.mvi.model.Task
 import com.kanawish.sample.mvi.model.TaskEditorModelStore
 import com.kanawish.sample.mvi.model.TaskEditorState
+import com.kanawish.sample.mvi.model.TaskEditorState.Closed
 import com.kanawish.sample.mvi.model.TaskEditorState.Editing
 import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent
 import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.CancelTaskClick
@@ -35,7 +37,7 @@ import javax.inject.Singleton
             is DescriptionChange -> buildEditDescriptionIntent(viewEvent)
             SaveTaskClick -> TODO()
             DeleteTaskClick -> TODO()
-            CancelTaskClick -> TODO()
+            CancelTaskClick -> buildCancelIntent()
         }
     }
 
@@ -68,6 +70,10 @@ import javax.inject.Singleton
 
         private fun buildCancelIntent() = editorIntent<Editing> {
             cancel()
+        }
+
+        fun buildAddTaskIntent(task: Task) = editorIntent<Closed> {
+            addTask(task)
         }
 
     }
