@@ -5,6 +5,7 @@ import com.kanawish.sample.mvi.model.TaskEditorModelStore
 import com.kanawish.sample.mvi.model.TaskEditorState
 import com.kanawish.sample.mvi.model.TaskEditorState.Closed
 import com.kanawish.sample.mvi.model.TaskEditorState.Editing
+import com.kanawish.sample.mvi.model.TasksModelStore
 import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent
 import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.CancelTaskClick
 import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.DeleteTaskClick
@@ -24,7 +25,8 @@ import javax.inject.Singleton
  * @see TasksIntentFactory  for lightweight "assert()" approach.
  */
 @Singleton class AddEditTaskIntentFactory @Inject constructor(
-    private val taskEditorModelStore: TaskEditorModelStore
+    private val taskEditorModelStore: TaskEditorModelStore,
+    private val tasksModelStore: TasksModelStore
 ) {
 
     fun process(viewEvent: AddEditTaskViewEvent) {
@@ -35,9 +37,43 @@ import javax.inject.Singleton
         return when (viewEvent) {
             is TitleChange -> buildEditTitleIntent(viewEvent)
             is DescriptionChange -> buildEditDescriptionIntent(viewEvent)
-            SaveTaskClick -> TODO()
-            DeleteTaskClick -> TODO()
+            SaveTaskClick -> buildSaveIntent()
+            DeleteTaskClick -> buildDeleteIntent()
             CancelTaskClick -> buildCancelIntent()
+        }
+    }
+
+    /**
+     * An example of delegating work to an external dependency.
+     *
+     * - Within the "SAVING" state scope, we use `task` to trigger our external save call.
+     */
+    private fun buildSaveIntent() = editorIntent<Editing> {
+        // NOTE: We'll jump from EDITING -> SAVING -> SAVE in one step, since we're synchronous for now.
+        // We first call `save()`, transitioning "EDITING" -> "SAVING".
+        save().run {
+            // NOTE: When we'll do this with a real backend + Retrofit, this will become asynchronous.
+            // `TasksStore` add/update this task.
+            val intent = TasksIntentFactory.buildAddOrUpdateTaskIntent(task)
+            tasksModelStore.process(intent)
+
+            // We call `saved()`, transitioning "SAVING" -> "CLOSED"
+            saved()
+        }
+    }
+
+    /**
+     * NOTE: Like `buildSaveIntent()` above, we're faking async.
+     */
+    private fun buildDeleteIntent() = editorIntent<Editing> {
+        // "EDITING" -> "DELETING"
+        delete().run {
+            // `TasksStore` deletes this tasks from its internal list.
+            val intent = TasksIntentFactory.buildDeleteTaskIntent(taskId)
+            tasksModelStore.process(intent)
+
+            // "DELETING" -> "CLOSED"
+            deleted()
         }
     }
 
@@ -74,6 +110,10 @@ import javax.inject.Singleton
 
         fun buildAddTaskIntent(task: Task) = editorIntent<Closed> {
             addTask(task)
+        }
+
+        fun buildEditTaskIntent(task: Task) = editorIntent<Closed> {
+            editTask(task)
         }
 
     }
