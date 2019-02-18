@@ -5,6 +5,7 @@ import com.kanawish.sample.mvi.intent.Intent
 import com.kanawish.sample.mvi.intent.intent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observables.ConnectableObservable
+import timber.log.Timber
 
 open class ModelStore<S>(startingState: S) : Model<S> {
 
@@ -16,6 +17,15 @@ open class ModelStore<S>(startingState: S) : Model<S> {
             .scan(startingState) { oldState, reducer -> reducer(oldState) }
             .replay(1)
             .apply { connect() }
+
+    /**
+     * Allows us to react to problems within the ModelStore.
+     */
+    private val internalDisposable = store.subscribe(::internalLogger, ::crashHandler)
+
+    private fun internalLogger(state:S) = Timber.i("$state")
+
+    private fun crashHandler(throwable: Throwable): Unit = throw throwable
 
     /**
      * Model will receive intents to be processed via this function.
