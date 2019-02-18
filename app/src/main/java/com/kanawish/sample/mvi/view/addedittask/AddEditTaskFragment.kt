@@ -7,19 +7,25 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import com.jakewharton.rxbinding2.widget.textChanges
 import com.kanawish.sample.mvi.R
-import kotlinx.android.synthetic.main.addtask_act.fab_edit_task_done
+import com.kanawish.sample.mvi.view.EventObservable
+import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.DescriptionChange
+import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.TitleChange
+import io.reactivex.Observable
+import kotlinx.android.synthetic.main.addtask_frag.add_task_description
+import kotlinx.android.synthetic.main.addtask_frag.add_task_title
 
 /**
  * Fragment for adding/editing tasks.
  */
-class AddEditTaskFragment : Fragment() {
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        fab_edit_task_done?.apply {
-            setImageResource(R.drawable.ic_done)
-        }
+class AddEditTaskFragment : Fragment(),
+    EventObservable<AddEditTaskViewEvent> {
+    override fun events(): Observable<AddEditTaskViewEvent> {
+        return Observable.merge(
+                add_task_title.textChanges().map { TitleChange(it.toString()) },
+                add_task_description.textChanges().map { DescriptionChange(it.toString()) }
+        )
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
