@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.model.TasksModelStore
+import kotlinx.android.synthetic.main.tasks_frag.view.tasksRecyclerView
 import javax.inject.Inject
 
 /**
@@ -18,9 +19,13 @@ class TasksFragment : Fragment() {
 
     @Inject lateinit var tasksModelStore: TasksModelStore
 
+    @Inject lateinit var tasksAdapter: TasksAdapter
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
-        return inflater.inflate(R.layout.tasks_frag, container, false)
+        return inflater.inflate(R.layout.tasks_frag, container, false).also { view ->
+            view.tasksRecyclerView.adapter = tasksAdapter
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
