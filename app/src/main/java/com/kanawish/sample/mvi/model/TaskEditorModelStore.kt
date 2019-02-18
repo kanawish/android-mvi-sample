@@ -7,4 +7,4 @@ import javax.inject.Singleton
 @SuppressLint("CheckResult")
 @Singleton
 class TaskEditorModelStore @Inject constructor() :
-    ModelStore<TaskEditorState>(TaskEditorState.Closed)
+    ModelStore<TaskEditorState>(TaskEditorState.Editing(Task(),true))
