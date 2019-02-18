@@ -10,11 +10,16 @@ import android.view.ViewGroup
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.intent.AddEditTaskIntentFactory
+import com.kanawish.sample.mvi.model.TaskEditorModelStore
+import com.kanawish.sample.mvi.model.TaskEditorState
 import com.kanawish.sample.mvi.view.EventObservable
+import com.kanawish.sample.mvi.view.StateSubscriber
 import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.DescriptionChange
 import com.kanawish.sample.mvi.view.addedittask.AddEditTaskViewEvent.TitleChange
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.ofType
 import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.addtask_frag.add_task_description
 import kotlinx.android.synthetic.main.addtask_frag.add_task_title
@@ -24,8 +29,10 @@ import javax.inject.Inject
  * Fragment for adding/editing tasks.
  */
 class AddEditTaskFragment : Fragment(),
+    StateSubscriber<TaskEditorState>,
     EventObservable<AddEditTaskViewEvent> {
 
+    @Inject lateinit var editorModelStore: TaskEditorModelStore
     @Inject lateinit var intentFactory: AddEditTaskIntentFactory
 
     private val disposables = CompositeDisposable()
@@ -35,6 +42,14 @@ class AddEditTaskFragment : Fragment(),
                 add_task_title.textChanges().map { TitleChange(it.toString()) },
                 add_task_description.textChanges().map { DescriptionChange(it.toString()) }
         )
+    }
+
+    override fun Observable<TaskEditorState>.subscribeToState(): Disposable {
+        // NOTE: Not _everything_ needs to be a CompositeDisposable + RxBindings...
+        return ofType<TaskEditorState.Editing>().firstElement().subscribe { editing ->
+            add_task_title.setText(editing.task.title)
+            add_task_description.setText(editing.task.description)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -48,6 +63,7 @@ class AddEditTaskFragment : Fragment(),
 
     override fun onResume() {
         super.onResume()
+        disposables += editorModelStore.modelState().subscribeToState()
         disposables += events().subscribe(intentFactory::process)
     }
 
