@@ -7,8 +7,7 @@ import javax.inject.Singleton
 class TasksModelStore @Inject constructor() :
         ModelStore<TasksState>(
                 TasksState(
-                        listOf(Task(title="One"),Task(title="Two"),Task(title="Three")),
-//                        emptyList(),
+                        emptyList(),
                         FilterType.ANY,
                         SyncState.IDLE
                 )
