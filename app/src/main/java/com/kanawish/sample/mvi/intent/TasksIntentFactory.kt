@@ -1,10 +1,15 @@
 package com.kanawish.sample.mvi.intent
 
 import com.kanawish.sample.mvi.model.FilterType
+import com.kanawish.sample.mvi.model.SyncState
+import com.kanawish.sample.mvi.model.SyncState.IDLE
+import com.kanawish.sample.mvi.model.SyncState.PROCESS
+import com.kanawish.sample.mvi.model.SyncState.PROCESS.Type.REFRESH
 import com.kanawish.sample.mvi.model.Task
 import com.kanawish.sample.mvi.model.TaskEditorModelStore
 import com.kanawish.sample.mvi.model.TasksModelStore
 import com.kanawish.sample.mvi.model.TasksState
+import com.kanawish.sample.mvi.model.backend.TasksRestApi
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.ClearCompletedClick
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.CompleteTaskClick
@@ -13,6 +18,8 @@ import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.FilterTypeClick
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.NewTaskClick
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.RefreshTasksClick
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.RefreshTasksSwipe
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,10 +30,10 @@ import javax.inject.Singleton
  *
  * @see AddEditTaskIntentFactory for state machine safety example.
  */
-@Singleton
-class TasksIntentFactory @Inject constructor(
+@Singleton class TasksIntentFactory @Inject constructor(
     private val tasksModelStore: TasksModelStore,
-    private val taskEditorModelStore: TaskEditorModelStore
+    private val taskEditorModelStore: TaskEditorModelStore,
+    private val tasksRestApi: TasksRestApi
 ) {
 
     fun process(event: TasksViewEvent) {
@@ -35,7 +42,7 @@ class TasksIntentFactory @Inject constructor(
 
     private fun toIntent(viewEvent:TasksViewEvent): Intent<TasksState> {
         return when (viewEvent) {
-            RefreshTasksSwipe, RefreshTasksClick -> TODO()
+            RefreshTasksSwipe, RefreshTasksClick -> buildReloadTasksIntent()
             ClearCompletedClick -> buildClearCompletedIntent()
             FilterTypeClick -> buildCycleFilterIntent()
             is CompleteTaskClick -> buildCompleteTaskClick(viewEvent)
@@ -75,6 +82,41 @@ class TasksIntentFactory @Inject constructor(
             copy(tasks = mutableList)
         }
     }
+
+    private fun buildReloadTasksIntent(): Intent<TasksState> {
+        return object:Intent<TasksState> {
+            override fun reducers(): Observable<Reducer<TasksState>> = buildRefreshReducers()
+        }
+    }
+
+    private fun buildRefreshReducers(): Observable<Reducer<TasksState>> {
+        return Observable.create<Reducer<TasksState>> { e ->
+            fun retrofitSuccess(loadedTasks: List<Task>) {
+                e.onNext { previousState ->
+                    assert(previousState.syncState == PROCESS(REFRESH))
+                    previousState.copy(tasks = loadedTasks, syncState = IDLE)
+                }
+            }
+
+            fun retrofitError(throwable: Throwable) {
+                e.onNext { previousState ->
+                    assert(previousState.syncState == PROCESS(REFRESH))
+                    previousState.copy(syncState = SyncState.ERROR(throwable))
+                }
+            }
+
+            e.onNext { previousState ->
+                assert(previousState.syncState == IDLE)
+
+                tasksRestApi.getTasks()
+                    .map { it.values.toList() }
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(::retrofitSuccess, ::retrofitError, e::onComplete)
+
+                previousState.copy(syncState = PROCESS(REFRESH))
+            }
+        }
+}
 
     private fun buildCycleFilterIntent(): Intent<TasksState> {
         return intent {
