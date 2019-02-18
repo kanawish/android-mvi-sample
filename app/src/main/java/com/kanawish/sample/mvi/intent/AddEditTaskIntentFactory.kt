@@ -66,5 +66,9 @@ import javax.inject.Singleton
             edit { copy(description = viewEvent.description) }
         }
 
+        private fun buildCancelIntent() = editorIntent<Editing> {
+            cancel()
+        }
+
     }
 }
