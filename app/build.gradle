@@ -32,6 +32,7 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
+    //noinspection GradleDependency
     implementation 'androidx.core:core-ktx:0.3'
 
     // Google Stack
