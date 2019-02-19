@@ -30,8 +30,8 @@ enum class FilterType {
     ACTIVE,
     COMPLETE ;
 
-    fun filter(task:Task):Boolean {
-        return when(this) {
+    fun filter(task: Task): Boolean {
+        return when (this) {
             ANY -> true
             ACTIVE -> !task.completed
             COMPLETE -> task.completed
@@ -50,7 +50,9 @@ sealed class SyncState {
     }
 
     data class PROCESS(val type: Type) : SyncState() {
-        enum class Type { REFRESH, CREATE, UPDATE }
+        enum class Type {
+            REFRESH, CREATE, UPDATE
+        }
     }
 
     data class ERROR(val throwable: Throwable) : SyncState()
@@ -85,7 +87,7 @@ data class TasksState(
         lastUpdate: Long
         title: String
         description: String
-        completed: String
+        completed: Boolean
     }
     class TasksModelState <<(D,orchid) data class>>{
         tasks:List<Task>,
