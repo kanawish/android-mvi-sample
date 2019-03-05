@@ -1,5 +1,6 @@
 package com.kanawish.sample.mvi.intent
 
+import com.kanawish.sample.mvi.model.Task
 import com.kanawish.sample.mvi.model.TaskEditorModelStore
 import com.kanawish.sample.mvi.model.TasksModelStore
 import com.kanawish.sample.mvi.model.TasksState
@@ -21,11 +22,16 @@ class TasksIntentFactory @Inject constructor(
         return when(viewEvent) {
             ClearCompletedClick -> TODO()
             FilterTypeClick -> TODO()
-            NewTaskClick -> TODO()
+            NewTaskClick -> buildNewTaskIntent()
             RefreshTasksClick -> TODO()
             RefreshTasksSwipe -> TODO()
             is CompleteTaskClick -> TODO()
             is EditTaskClick -> TODO()
         }
+    }
+
+    private fun buildNewTaskIntent(): Intent<TasksState> = sideEffect {
+        val addIntent = AddEditTaskIntentFactory.buildAddTaskIntent(Task())
+        taskEditorModelStore.process(addIntent)
     }
 }
