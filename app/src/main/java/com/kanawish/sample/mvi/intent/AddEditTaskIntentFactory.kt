@@ -31,7 +31,7 @@ import javax.inject.Singleton
             is DescriptionChange -> buildEditDescriptionIntent(viewEvent)
             SaveTaskClick -> TODO()
             DeleteTaskClick -> TODO()
-            CancelTaskClick -> TODO()
+            CancelTaskClick -> buildCancelIntent()
         }
     }
 
@@ -58,6 +58,7 @@ import javax.inject.Singleton
             edit { copy( description= viewEvent.description) }
         }
 
+        private fun buildCancelIntent() = editorIntent<Editing> { cancel() }
     }
 
 }
