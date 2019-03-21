@@ -32,9 +32,7 @@ class TasksAdapter @Inject constructor(
 
     override fun Observable<TasksState>.subscribeToState(): Disposable {
         return this
-            .map { (tasks,filter) ->
-                tasks.filter { task -> filter.filter(task) }
-            }
+            .map(TasksState::filteredTasks)
             .distinctUntilChanged()
             .subscribe { updatedTasks ->
                 filteredTasks = updatedTasks

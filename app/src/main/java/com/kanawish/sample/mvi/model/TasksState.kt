@@ -62,7 +62,11 @@ data class TasksState(
     val tasks: List<Task>,
     val filter: FilterType,
     val syncState: SyncState
-)
+) {
+    fun filteredTasks(): List<Task> {
+        return tasks.filter { task -> filter.filter(task) }
+    }
+}
 
 /*
     State Diagram for SyncState

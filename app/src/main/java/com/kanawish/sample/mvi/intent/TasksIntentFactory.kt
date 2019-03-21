@@ -1,5 +1,6 @@
 package com.kanawish.sample.mvi.intent
 
+import com.kanawish.sample.mvi.model.FilterType
 import com.kanawish.sample.mvi.model.Task
 import com.kanawish.sample.mvi.model.TaskEditorModelStore
 import com.kanawish.sample.mvi.model.TasksModelStore
@@ -15,6 +16,13 @@ import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.RefreshTasksSwipe
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * TasksIntentFactory is responsible for turning TasksViewEvent into
+ * Intent<TasksState>, and coordinates with any other dependencies such as
+ * ModelStores, Repositories or Services.
+ *
+ * @see AddEditTaskIntentFactory for state machine safety example.
+ */
 @Singleton
 class TasksIntentFactory @Inject constructor(
     private val tasksModelStore: TasksModelStore,
@@ -26,8 +34,8 @@ class TasksIntentFactory @Inject constructor(
 
     private fun toIntent(viewEvent: TasksViewEvent): Intent<TasksState> {
         return when(viewEvent) {
-            ClearCompletedClick -> TODO()
-            FilterTypeClick -> TODO()
+            ClearCompletedClick -> buildClearCompletedIntent()
+            FilterTypeClick -> buildCycleFilterIntent()
             RefreshTasksSwipe, RefreshTasksClick -> TODO()
             NewTaskClick -> buildNewTaskIntent()
             is CompleteTaskClick -> buildCompleteTaskClick(viewEvent)
@@ -61,6 +69,22 @@ class TasksIntentFactory @Inject constructor(
                 viewEvent.task.copy(completed = viewEvent.checked)
             // Take the modified list, and create a new copy of tasksState with it.
             copy(tasks = mutableList)
+        }
+    }
+
+    private fun buildCycleFilterIntent(): Intent<TasksState> {
+        return intent {
+            copy( filter = when(filter) {
+                FilterType.ANY -> FilterType.ACTIVE
+                FilterType.ACTIVE -> FilterType.COMPLETE
+                FilterType.COMPLETE -> FilterType.ANY
+            })
+        }
+    }
+
+    private fun buildClearCompletedIntent(): Intent<TasksState> {
+        return intent {
+            copy(tasks = tasks.filter { !it.completed }.toList())
         }
     }
 
