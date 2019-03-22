@@ -49,7 +49,7 @@ sealed class SyncState {
         override fun toString(): String = "IDLE"
     }
 
-    data class PROCESS(val type: Type) : SyncState() {
+    data class PROCESS(val type: Type, val cancel: () -> Unit) : SyncState() {
         enum class Type {
             REFRESH, CREATE, UPDATE
         }

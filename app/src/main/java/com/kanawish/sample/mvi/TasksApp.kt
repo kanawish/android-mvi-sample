@@ -2,6 +2,7 @@ package com.kanawish.sample.mvi
 
 import android.app.Application
 import com.kanawish.sample.mvi.di.ToothpickActivityLifecycleCallbacks
+import com.kanawish.sample.mvi.model.backend.TasksRestApiModule
 import timber.log.Timber
 import toothpick.Scope
 import toothpick.Toothpick
@@ -41,7 +42,8 @@ class TasksApp : Application() {
     private fun openApplicationScope(app: Application): Scope {
         return Toothpick.openScope(app).apply {
             installModules(
-                    SmoothieApplicationModule(app)
+                    SmoothieApplicationModule(app),
+                    TasksRestApiModule
             )
         }
     }

@@ -1,10 +1,15 @@
 package com.kanawish.sample.mvi.intent
 
 import com.kanawish.sample.mvi.model.FilterType
+import com.kanawish.sample.mvi.model.SyncState
+import com.kanawish.sample.mvi.model.SyncState.*
+import com.kanawish.sample.mvi.model.SyncState.PROCESS.*
+import com.kanawish.sample.mvi.model.SyncState.PROCESS.Type.*
 import com.kanawish.sample.mvi.model.Task
 import com.kanawish.sample.mvi.model.TaskEditorModelStore
 import com.kanawish.sample.mvi.model.TasksModelStore
 import com.kanawish.sample.mvi.model.TasksState
+import com.kanawish.sample.mvi.model.backend.TasksRestApi
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.ClearCompletedClick
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.CompleteTaskClick
@@ -13,6 +18,7 @@ import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.FilterTypeClick
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.NewTaskClick
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.RefreshTasksClick
 import com.kanawish.sample.mvi.view.tasks.TasksViewEvent.RefreshTasksSwipe
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,7 +32,8 @@ import javax.inject.Singleton
 @Singleton
 class TasksIntentFactory @Inject constructor(
     private val tasksModelStore: TasksModelStore,
-    private val taskEditorModelStore: TaskEditorModelStore
+    private val taskEditorModelStore: TaskEditorModelStore,
+    private val tasksRestApi: TasksRestApi
 ){
     fun process(event:TasksViewEvent) {
         tasksModelStore.process(toIntent(event))
@@ -36,7 +43,7 @@ class TasksIntentFactory @Inject constructor(
         return when(viewEvent) {
             ClearCompletedClick -> buildClearCompletedIntent()
             FilterTypeClick -> buildCycleFilterIntent()
-            RefreshTasksSwipe, RefreshTasksClick -> TODO()
+            RefreshTasksSwipe, RefreshTasksClick -> buildReloadTasksIntent()
             NewTaskClick -> buildNewTaskIntent()
             is CompleteTaskClick -> buildCompleteTaskClick(viewEvent)
             is EditTaskClick -> buildEditTaskIntent(viewEvent)
@@ -69,6 +76,34 @@ class TasksIntentFactory @Inject constructor(
                 viewEvent.task.copy(completed = viewEvent.checked)
             // Take the modified list, and create a new copy of tasksState with it.
             copy(tasks = mutableList)
+        }
+    }
+
+    // Getting comfortable with simple DSL-style-builders is valuable in MVI.
+    private fun chainedIntent(block:TasksState.()->TasksState) =
+        tasksModelStore.process(intent(block))
+
+    private fun buildReloadTasksIntent(): Intent<TasksState> {
+        return intent {
+
+            assert(syncState == IDLE)
+
+            fun retrofitSuccess(loadedTasks:List<Task>) = chainedIntent {
+                assert(syncState is PROCESS && syncState.type == REFRESH)
+                copy(tasks = loadedTasks, syncState = IDLE)
+            }
+
+            fun retrofitError(throwable:Throwable) = chainedIntent {
+                assert(syncState is PROCESS && syncState.type == REFRESH)
+                copy(syncState = ERROR(throwable))
+            }
+
+            val disposable = tasksRestApi.getTasks()
+                .map { it.values.toList() }
+                .subscribeOn(Schedulers.io())
+                .subscribe(::retrofitSuccess, ::retrofitError)
+
+            copy( syncState = PROCESS(REFRESH, disposable::dispose))
         }
     }
 
