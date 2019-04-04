@@ -112,7 +112,7 @@ class TasksActivity : AppCompatActivity(),
                         .also { startActivity(it) }
                 }
             }
-            menuItem.isChecked = true
+            menuItem.isChecked = false
             drawerLayout.closeDrawers()
         }
     }
