@@ -51,7 +51,7 @@ sealed class SyncState {
 
     data class PROCESS(val type: Type, val cancel: () -> Unit) : SyncState() {
         enum class Type {
-            REFRESH, CREATE, UPDATE
+            REFRESH, CHECK
         }
     }
 
@@ -67,6 +67,18 @@ data class TasksState(
         return tasks.filter { task -> filter.filter(task) }
     }
 }
+
+/*
+    State Diagram for SyncState
+
+@startuml
+[*] --> OFF
+OFF -left-> ON : switch on
+OFF -left-> ON : switch on
+ON -right-> OFF : switch off
+@enduml
+
+ */
 
 /*
     State Diagram for SyncState
