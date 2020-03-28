@@ -5,8 +5,9 @@ import android.os.Bundle
 import androidx.core.view.GravityCompat
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import com.jakewharton.rxbinding2.support.design.widget.itemSelections
-import com.jakewharton.rxbinding2.view.clicks
+import com.jakewharton.rxbinding3.material.itemSelections
+import com.jakewharton.rxbinding3.widget.itemSelections
+import com.jakewharton.rxbinding3.view.clicks
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.intent.TasksIntentFactory
 import com.kanawish.sample.mvi.model.TaskEditorModelStore

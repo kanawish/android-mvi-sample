@@ -2,8 +2,8 @@ package com.kanawish.sample.mvi.view.tasks
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.jakewharton.rxbinding2.view.clicks
-import com.jakewharton.rxbinding2.widget.checkedChanges
+import com.jakewharton.rxbinding3.view.clicks
+import com.jakewharton.rxbinding3.widget.checkedChanges
 import com.kanawish.sample.mvi.model.Task
 import com.kanawish.sample.mvi.view.EventObservable
 import io.reactivex.Observable

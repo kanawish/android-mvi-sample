@@ -1,17 +1,11 @@
 package com.kanawish.sample.mvi.view.tasks
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
-import com.jakewharton.rxbinding2.support.v4.widget.refreshes
-import com.jakewharton.rxbinding2.view.clicks
-import com.jakewharton.rxbinding2.view.visibility
-import com.jakewharton.rxbinding2.widget.text
-import com.jakewharton.rxbinding2.widget.textRes
+import com.jakewharton.rxbinding3.swiperefreshlayout.refreshes
+import com.jakewharton.rxbinding3.view.clicks
+import com.jakewharton.rxbinding3.view.visibility
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.intent.TasksIntentFactory
 import com.kanawish.sample.mvi.model.FilterType
@@ -25,11 +19,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.ofType
 import io.reactivex.rxkotlin.plusAssign
-import kotlinx.android.synthetic.main.tasks_frag.filteringLabelTextView
-import kotlinx.android.synthetic.main.tasks_frag.noTasksLinearLayout
-import kotlinx.android.synthetic.main.tasks_frag.noTasksMainTextView
-import kotlinx.android.synthetic.main.tasks_frag.swipeRefreshLayout
-import kotlinx.android.synthetic.main.tasks_frag.view.tasksRecyclerView
+import kotlinx.android.synthetic.main.tasks_frag.*
+import kotlinx.android.synthetic.main.tasks_frag.view.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -50,10 +41,9 @@ class TasksFragment : Fragment(),
 
     override fun Observable<TasksState>.subscribeToState(): Disposable {
         return CompositeDisposable(
-            map { it.syncState }.ofType<SyncState.ERROR>().map { it.throwable }
-                .subscribe(Timber::e),
+            map { it.syncState }.ofType<SyncState.ERROR>().map { it.throwable }.subscribe(Timber::e),
             map { it.syncState is SyncState.PROCESS }.subscribe(swipeRefreshLayout::setRefreshing),
-            map { it.filter.name }.subscribe(filteringLabelTextView.text()),
+            map { it.filter.name }.subscribe(filteringLabelTextView::setText),
             map { it.filteredTasks().isEmpty() }.subscribe(noTasksLinearLayout.visibility()),
             map { tasksState ->
                 when (tasksState.filter) {
@@ -61,7 +51,7 @@ class TasksFragment : Fragment(),
                     FilterType.ACTIVE -> R.string.no_tasks_active
                     FilterType.COMPLETE -> R.string.no_tasks_completed
                 }
-            }.subscribe(noTasksMainTextView.textRes())
+            }.subscribe(noTasksMainTextView::setText)
         )
     }
 

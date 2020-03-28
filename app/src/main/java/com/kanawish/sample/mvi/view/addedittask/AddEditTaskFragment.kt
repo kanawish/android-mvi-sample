@@ -7,7 +7,7 @@ import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.jakewharton.rxbinding2.widget.textChanges
+import com.jakewharton.rxbinding3.widget.textChanges
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.intent.AddEditTaskIntentFactory
 import com.kanawish.sample.mvi.model.TaskEditorModelStore
