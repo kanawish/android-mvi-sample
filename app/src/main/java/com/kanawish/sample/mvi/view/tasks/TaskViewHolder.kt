@@ -1,9 +1,9 @@
 package com.kanawish.sample.mvi.view.tasks
 
-import android.support.v7.widget.RecyclerView
 import android.view.View
-import com.jakewharton.rxbinding2.view.clicks
-import com.jakewharton.rxbinding2.widget.checkedChanges
+import androidx.recyclerview.widget.RecyclerView
+import com.jakewharton.rxbinding3.view.clicks
+import com.jakewharton.rxbinding3.widget.checkedChanges
 import com.kanawish.sample.mvi.model.Task
 import com.kanawish.sample.mvi.view.EventObservable
 import io.reactivex.Observable
@@ -19,10 +19,10 @@ import kotlinx.android.synthetic.main.task_item.view.title
  * You could imagine scenarios where a ViewHolder points to a "live" source of
  * data. In those cases, binding an Observable would be a good approach.
  */
-class TaskViewHolder(view: View):RecyclerView.ViewHolder(view), EventObservable<TasksViewEvent> {
+class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view), EventObservable<TasksViewEvent> {
     private lateinit var currentTask: Task
 
-    fun bind(task:Task) {
+    fun bind(task: Task) {
         currentTask = task
         itemView.title.text = task.title
         itemView.completeCheckBox.isChecked = task.completed
@@ -30,12 +30,12 @@ class TaskViewHolder(view: View):RecyclerView.ViewHolder(view), EventObservable<
 
     override fun events(): Observable<TasksViewEvent> {
         return Observable.merge(
-                itemView.completeCheckBox.checkedChanges().skipInitialValue().map { checked ->
-                    TasksViewEvent.CompleteTaskClick(currentTask,checked)
-                },
-                itemView.title.clicks().map {
-                    TasksViewEvent.EditTaskClick(currentTask)
-                }
+            itemView.completeCheckBox.checkedChanges().skipInitialValue().map { checked ->
+                TasksViewEvent.CompleteTaskClick(currentTask, checked)
+            },
+            itemView.title.clicks().map {
+                TasksViewEvent.EditTaskClick(currentTask)
+            }
         )
     }
 }

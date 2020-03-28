@@ -1,8 +1,8 @@
 package com.kanawish.sample.mvi.view.tasks
 
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.intent.TasksIntentFactory
 import com.kanawish.sample.mvi.model.Task

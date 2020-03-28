@@ -1,12 +1,12 @@
 package com.kanawish.sample.mvi.view.addedittask
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import com.jakewharton.rxbinding2.support.v7.widget.itemClicks
-import com.jakewharton.rxbinding2.view.clicks
+import androidx.appcompat.app.AppCompatActivity
+import com.jakewharton.rxbinding3.appcompat.itemClicks
+import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxrelay2.PublishRelay
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.intent.AddEditTaskIntentFactory
