@@ -1,12 +1,12 @@
 package com.kanawish.sample.mvi.view.addedittask
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.intent.AddEditTaskIntentFactory
@@ -56,7 +56,7 @@ class AddEditTaskFragment : Fragment(),
         return inflater.inflate(R.layout.addtask_frag, container, false)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.addtask_fragment_menu, menu)
     }
 

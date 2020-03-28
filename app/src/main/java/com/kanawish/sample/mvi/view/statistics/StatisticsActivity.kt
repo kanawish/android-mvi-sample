@@ -1,7 +1,7 @@
 package com.kanawish.sample.mvi.view.statistics
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.kanawish.sample.mvi.R
 import com.kanawish.sample.mvi.util.replaceFragmentInActivity
 import com.kanawish.sample.mvi.util.setupActionBar

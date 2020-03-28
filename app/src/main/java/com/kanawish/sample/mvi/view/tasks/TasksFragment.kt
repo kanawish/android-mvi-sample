@@ -1,12 +1,12 @@
 package com.kanawish.sample.mvi.view.tasks
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.jakewharton.rxbinding2.support.v4.widget.refreshes
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxbinding2.view.visibility
@@ -36,32 +36,32 @@ import javax.inject.Inject
 /**
  * This fragment hold the UI for the list of tasks you can check off.
  */
-class TasksFragment :
-    Fragment(),
+class TasksFragment : Fragment(),
     StateSubscriber<TasksState>,
-    EventObservable<TasksViewEvent>
-{
+    EventObservable<TasksViewEvent> {
     @Inject lateinit var tasksModelStore: TasksModelStore
     @Inject lateinit var tasksIntentFactory: TasksIntentFactory
 
     private val disposables = CompositeDisposable()
-    private val menuDisposables = CompositeDisposable() // NOTE: We work around Android 'menu lifecycle'
+    private val menuDisposables =
+        CompositeDisposable() // NOTE: We work around Android 'menu lifecycle'
 
     @Inject lateinit var tasksAdapter: TasksAdapter
 
     override fun Observable<TasksState>.subscribeToState(): Disposable {
         return CompositeDisposable(
-                map { it.syncState }.ofType<SyncState.ERROR>().map { it.throwable }.subscribe(Timber::e),
-                map { it.syncState is SyncState.PROCESS }.subscribe(swipeRefreshLayout::setRefreshing),
-                map { it.filter.name }.subscribe(filteringLabelTextView.text()),
-                map { it.filteredTasks().isEmpty() }.subscribe(noTasksLinearLayout.visibility()),
-                map { tasksState ->
-                    when(tasksState.filter) {
-                        FilterType.ANY -> R.string.no_tasks_all
-                        FilterType.ACTIVE -> R.string.no_tasks_active
-                        FilterType.COMPLETE -> R.string.no_tasks_completed
-                    }
-                }.subscribe(noTasksMainTextView.textRes())
+            map { it.syncState }.ofType<SyncState.ERROR>().map { it.throwable }
+                .subscribe(Timber::e),
+            map { it.syncState is SyncState.PROCESS }.subscribe(swipeRefreshLayout::setRefreshing),
+            map { it.filter.name }.subscribe(filteringLabelTextView.text()),
+            map { it.filteredTasks().isEmpty() }.subscribe(noTasksLinearLayout.visibility()),
+            map { tasksState ->
+                when (tasksState.filter) {
+                    FilterType.ANY -> R.string.no_tasks_all
+                    FilterType.ACTIVE -> R.string.no_tasks_active
+                    FilterType.COMPLETE -> R.string.no_tasks_completed
+                }
+            }.subscribe(noTasksMainTextView.textRes())
         )
     }
 
@@ -71,7 +71,11 @@ class TasksFragment :
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         setHasOptionsMenu(true)
         return inflater
             .inflate(R.layout.tasks_frag, container, false)
@@ -93,9 +97,9 @@ class TasksFragment :
         // This means we need to create a ViewEvent source, convert to Intent
         // and subscribeToState the model...
         val menuEvents = Observable.merge(
-                menu.findItem(R.id.menu_filter).clicks().map { TasksViewEvent.FilterTypeClick },
-                menu.findItem(R.id.menu_refresh).clicks().map { TasksViewEvent.RefreshTasksClick },
-                menu.findItem(R.id.menu_clear).clicks().map { TasksViewEvent.ClearCompletedClick }
+            menu.findItem(R.id.menu_filter).clicks().map { TasksViewEvent.FilterTypeClick },
+            menu.findItem(R.id.menu_refresh).clicks().map { TasksViewEvent.RefreshTasksClick },
+            menu.findItem(R.id.menu_clear).clicks().map { TasksViewEvent.ClearCompletedClick }
         )
 
         // Add the new subscription to disposables, as needed.

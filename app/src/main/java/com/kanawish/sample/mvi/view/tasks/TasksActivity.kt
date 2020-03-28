@@ -2,9 +2,9 @@ package com.kanawish.sample.mvi.view.tasks
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.view.GravityCompat
-import android.support.v7.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import com.jakewharton.rxbinding2.support.design.widget.itemSelections
 import com.jakewharton.rxbinding2.view.clicks
 import com.kanawish.sample.mvi.R
@@ -22,9 +22,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.ofType
 import io.reactivex.rxkotlin.plusAssign
-import kotlinx.android.synthetic.main.tasks_act.drawerLayout
-import kotlinx.android.synthetic.main.tasks_act.navView
-import kotlinx.android.synthetic.main.tasks_act.newTaskFloatingActionButton
+import kotlinx.android.synthetic.main.tasks_act.*
 import javax.inject.Inject
 
 /**
