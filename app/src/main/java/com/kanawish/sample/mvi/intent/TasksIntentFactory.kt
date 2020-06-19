@@ -85,7 +85,6 @@ class TasksIntentFactory @Inject constructor(
 
     private fun buildReloadTasksIntent(): Intent<TasksState> {
         return intent {
-
             assert(syncState == IDLE)
 
             fun retrofitSuccess(loadedTasks:List<Task>) = chainedIntent {
